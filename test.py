@@ -22,17 +22,17 @@ try:
         #     device1.setRGB(2, 0, limit-i, i)
         #     time.sleep(t)
 
-        print("BTN1:", device1.getBTN(1))
-        print("BTN2:", device1.getBTN(2))
+        # print("BTN1:", device1.getBTN(1))
+        # print("BTN2:", device1.getBTN(2))
 
-        print("D1:", device1.getDIG(1))
-        print("D2:", device1.getDIG(2))
-        print("D3:", device1.getDIG(3))
-        print("D4:", device1.getDIG(4))
+        # print("D1:", device1.getDIG(1))
+        # print("D2:", device1.getDIG(2))
+        # print("D3:", device1.getDIG(3))
+        # print("D4:", device1.getDIG(4))
 
-        print("A1:", device1.getANG(1))
-        print("A2:", device1.getANG(2))
-        print("A3:", device1.getANG(4))
+        # print("A1:", device1.getANG(1))
+        # print("A2:", device1.getANG(2))
+        # print("A3:", device1.getANG(4))
 
         time.sleep(t)
 

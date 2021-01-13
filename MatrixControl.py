@@ -12,10 +12,14 @@ class Mini:
         time.sleep(2)
 
     def setMotor(self, num, pwm):
+        if pwm < 0:
+            _pwm = 255-(~pwm)
+        else:
+            _pwm = pwm
         if num == 1:
-            self.__sendbuff(MiniP.M1_SET, pwm)
+            self.__sendbuff(MiniP.M1_SET, _pwm)
         elif num == 2:
-            self.__sendbuff(MiniP.M2_SET, pwm)
+            self.__sendbuff(MiniP.M2_SET, _pwm)
         else:
             print('parameter error')
             return None
