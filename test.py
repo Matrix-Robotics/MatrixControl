@@ -33,7 +33,7 @@ try:
         # print("A1:", device1.getANG(1))
         # print("A2:", device1.getANG(2))
         # print("A3:", device1.getANG(4))
-
+        device1.setMOTOR(1, 100)
         time.sleep(t)
 
 except KeyboardInterrupt:

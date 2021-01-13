@@ -11,11 +11,14 @@ class Mini:
         self.__port = serial.Serial(self.portlist[num], buad, timeout=timeout)
         time.sleep(2)
 
-    def setMotor(self, num, pwm):
-        if pwm < 0:
+    def setMOTOR(self, num, pwm):
+        if pwm < 0 and pwm > -101:
             _pwm = 255-(~pwm)
-        else:
+        elif pwm > 0 and pwm < 101:
             _pwm = pwm
+        else:
+            _pwm = None
+            print('parameter error')
         if num == 1:
             self.__sendbuff(MiniP.M1_SET, _pwm)
         elif num == 2:
