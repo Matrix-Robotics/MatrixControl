@@ -2,7 +2,7 @@ import time
 from MatrixControl import Mini
 
 device1 = Mini(0, 115200)
-t = 0.5
+t = 1
 limit = 100
 step = 5
 
@@ -34,6 +34,13 @@ try:
         # print("A2:", device1.getANG(2))
         # print("A3:", device1.getANG(4))
         device1.setMOTOR(1, 100)
+        device1.setMOTOR(2, 100)
+
+        time.sleep(t)
+
+        device1.setMOTOR(1, -100)
+        device1.setMOTOR(2, -100)
+        
         time.sleep(t)
 
 except KeyboardInterrupt:

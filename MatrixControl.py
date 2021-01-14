@@ -13,9 +13,9 @@ class Mini:
 
     def setMOTOR(self, num, pwm):
         if pwm < 0 and pwm > -101:
-            _pwm = 255-(~pwm)
-        elif pwm > 0 and pwm < 101:
-            _pwm = pwm
+            _pwm = 255-(~pwm-1)
+        elif pwm > -1 and pwm < 101:
+            _pwm = pwm+1
         else:
             _pwm = None
             print('parameter error')
@@ -28,40 +28,48 @@ class Mini:
             return None
 
     def setRC(self, num, angle):
+        _angle = self.__txEncode(angle)
+
         if num == 1:
-            self.__sendbuff(MiniP.RC1_SET, angle)
+            self.__sendbuff(MiniP.RC1_SET, _angle)
         elif num == 2:
-            self.__sendbuff(MiniP.RC2_SET, angle)
+            self.__sendbuff(MiniP.RC2_SET, _angle)
         elif num == 3:
-            self.__sendbuff(MiniP.RC3_SET, angle)
+            self.__sendbuff(MiniP.RC3_SET, _angle)
         elif num == 4:
-            self.__sendbuff(MiniP.RC4_SET, angle)
+            self.__sendbuff(MiniP.RC4_SET, _angle)
         else:
             print('parameter error')
             return None
 
     def setDIG(self, num, logic):
+        _logic = self.__txEncode(logic)
+
         if num == 1:
-            self.__sendbuff(MiniP.D1_SET, logic)
+            self.__sendbuff(MiniP.D1_SET, _logic)
         elif num == 2:
-            self.__sendbuff(MiniP.D2_SET, logic)
+            self.__sendbuff(MiniP.D2_SET, _logic)
         elif num == 3:
-            self.__sendbuff(MiniP.D3_SET, logic)
+            self.__sendbuff(MiniP.D3_SET, _logic)
         elif num == 4:
-            self.__sendbuff(MiniP.D4_SET, logic)
+            self.__sendbuff(MiniP.D4_SET, _logic)
         else:
             print('parameter error')
             return None
 
     def setRGB(self, num, pwmR, pwmG, pwmB):
+        _pwmR = self.__txEncode(pwmR)
+        _pwmG = self.__txEncode(pwmR)
+        _pwmB = self.__txEncode(pwmR)
+
         if num == 1:
-            self.__sendbuff(MiniP.RGB1R_SET, pwmR)
-            self.__sendbuff(MiniP.RGB1G_SET, pwmG)
-            self.__sendbuff(MiniP.RGB1B_SET, pwmB)
+            self.__sendbuff(MiniP.RGB1R_SET, _pwmR)
+            self.__sendbuff(MiniP.RGB1G_SET, _pwmG)
+            self.__sendbuff(MiniP.RGB1B_SET, _pwmB)
         elif num == 2:
-            self.__sendbuff(MiniP.RGB2R_SET, pwmR)
-            self.__sendbuff(MiniP.RGB2G_SET, pwmG)
-            self.__sendbuff(MiniP.RGB2B_SET, pwmB)
+            self.__sendbuff(MiniP.RGB2R_SET, _pwmR)
+            self.__sendbuff(MiniP.RGB2G_SET, _pwmG)
+            self.__sendbuff(MiniP.RGB2B_SET, _pwmB)
         else:
             print('parameter error')
             return None
@@ -139,3 +147,13 @@ class Mini:
         while ((time.time() - tic) < self.__timeout):
             while self.__port.in_waiting:
                 self.__rxbuff = int(self.__port.readline().decode().rstrip("\r\n"), 16)
+
+    def __txEncode(self, para):
+        _para = int(para)
+        if _para > 254:
+            return 255
+        elif _para < 0:
+            print('parameter error')
+            return None
+        else:
+            return _para+1
