@@ -4,11 +4,13 @@ import time
 
 
 class Mini:
-    def __init__(self, num, buad=115200, timeout=0.1):
+    def __init__(self, num, buad=115200, tout=0.1):
         self.__rxbuff = ''
-        self.__timeout = timeout
+        self.__timeout = tout
+        self.__num = num
         self.__findPort()
-        self.__port = serial.Serial(self.portlist[num], buad, timeout=timeout)
+        self.__buad = buad
+        self.__port = serial.Serial(self.portlist[self.__num], buad, timeout=tout)
         time.sleep(2)
 
     def setMOTOR(self, num, pwm):
@@ -59,8 +61,8 @@ class Mini:
 
     def setRGB(self, num, pwmR, pwmG, pwmB):
         _pwmR = self.__txEncode(pwmR)
-        _pwmG = self.__txEncode(pwmR)
-        _pwmB = self.__txEncode(pwmR)
+        _pwmG = self.__txEncode(pwmG)
+        _pwmB = self.__txEncode(pwmB)
 
         if num == 1:
             self.__sendbuff(MiniP.RGB1R_SET, _pwmR)
@@ -113,7 +115,13 @@ class Mini:
         self.__readbuff()
         return self.__rxbuff
 
+    def RST(self):
+        self.__port.close()
+        self.__port = serial.Serial(self.portlist[self.__num], self.__buad, timeout=self.__timeout)
+        time.sleep(2)
+
     def close(self):
+        self.RST()
         self.__port.close()
 
     def __findPort(self):
