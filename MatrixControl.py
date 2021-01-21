@@ -275,10 +275,10 @@ class Micro:
 
     def __txEncode(self, para):
         _para = int(para)
-        if _para > 254:
-            return 255
+        if _para > 180:
+            return 180
         elif _para < 0:
             print('parameter error')
             return None
         else:
-            return _para+1
+            return _para
