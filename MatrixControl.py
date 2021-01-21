@@ -179,17 +179,19 @@ class Micro:
         time.sleep(0.5)
 
     def setMOTOR(self, num, pwm):
-        if pwm < 0 and pwm > -101:
-            _pwm = 255-(~pwm-1)
-        elif pwm > -1 and pwm < 101:
-            _pwm = pwm+1
+        if pwm < 0 and pwm > -100:
+            _pwm = 255-(~pwm)
+        elif pwm > -1 and pwm < 100:
+            _pwm = pwm
         else:
             _pwm = None
             print('parameter error')
         if num == 1:
             self.__sendbuff(MicroP.M1_SET, _pwm)
+            time.sleep(0.01)
         elif num == 2:
             self.__sendbuff(MicroP.M2_SET, _pwm)
+            time.sleep(0.01)
         else:
             print('parameter error')
             return None
@@ -269,7 +271,7 @@ class Micro:
         tic = time.time()
         while ((time.time() - tic) < self.__timeout):
             while self.__port.in_waiting:
-                self.__rxbuff = int(self.__port.readline().decode().rstrip("\r\n"), 16)
+                self.__rxbuff = self.__port.readline().decode().rstrip("\r\n")
 
     def __txEncode(self, para):
         _para = int(para)
