@@ -179,9 +179,9 @@ class Micro:
         time.sleep(0.5)
 
     def setMOTOR(self, num, pwm):
-        if pwm < 0 and pwm > -100:
+        if pwm < 0 and pwm > -101:
             _pwm = 255-(~pwm)
-        elif pwm > -1 and pwm < 100:
+        elif pwm > -1 and pwm < 101:
             _pwm = pwm
         else:
             _pwm = None
