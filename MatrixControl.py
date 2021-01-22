@@ -232,6 +232,17 @@ class Micro:
         self.__readbuff()
         return self.__rxbuff
 
+    def getUR(self, num):
+        if num == 1:
+            self.__sendbuff(MicroP.URD1_GET)
+        elif num == 2:
+            self.__sendbuff(MicroP.URD2_GET)
+        else:
+            print('parameter error')
+            return None
+        self.__readbuff()
+        return self.__rxbuff
+
     def RST(self):
         self.__port.close()
         self.__port = serial.Serial(self.portlist[self.__num], self.__buad, timeout=self.__timeout)
