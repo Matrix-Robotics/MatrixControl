@@ -6,12 +6,21 @@ import time
 
 class Mini:
     def __init__(self, num, buad=115200, tout=0.1):
+        """ Using buad rate and tout to control Matrix Mini board.
+
+        Args:
+            num (int): Device number, eg: 0, 1, ...
+            buad (int, optional): [buad rate]. Defaults to 115200.
+            tout (float, optional): [Upper limit of time out, seconds]. Defaults to 0.1.
+        """
+        # rxbuff: recieve buffer
         self.__rxbuff = ''
         self.__timeout = tout
         self.__num = num
         self.__findPort()
         self.__buad = buad
         self.__port = serial.Serial(self.portlist[self.__num], buad, timeout=tout)
+        # Wait 2 sec for Mini to boot.
         time.sleep(2)
 
     def setMOTOR(self, num, pwm):
@@ -22,6 +31,7 @@ class Mini:
         else:
             _pwm = None
             print('parameter error')
+
         if num == 1:
             self.__sendbuff(MiniP.M1_SET, _pwm)
         elif num == 2:
@@ -170,12 +180,20 @@ class Mini:
 
 class Micro:
     def __init__(self, num, buad=115200, tout=0.1):
+        """ Using buad rate and tout to control Micro Mini board.
+
+        Args:
+            num (int): Device number, eg: 0, 1, ...
+            buad (int, optional): [buad rate]. Defaults to 115200.
+            tout (float, optional): [tout]. Defaults to 0.1.
+        """
         self.__rxbuff = ''
         self.__timeout = tout
         self.__num = num
         self.__findPort()
         self.__buad = buad
         self.__port = serial.Serial(self.portlist[self.__num], buad, timeout=tout)
+        # Wait 0.5 sec for Mini to boot.
         time.sleep(0.5)
 
     def setMOTOR(self, num, pwm):
@@ -188,9 +206,11 @@ class Micro:
             print('parameter error')
         if num == 1:
             self.__sendbuff(MicroP.M1_SET, _pwm)
+            # Waiting for device run motor
             time.sleep(0.01)
         elif num == 2:
             self.__sendbuff(MicroP.M2_SET, _pwm)
+            # Waiting for device run motor
             time.sleep(0.01)
         else:
             print('parameter error')
