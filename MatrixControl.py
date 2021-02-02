@@ -144,11 +144,11 @@ class Mini:
             return None
         if comports:
             com_ports_list = list(comports())
-            fidi_port = []
+            ftdi_port = []
             for port in com_ports_list:
                 if port[2].startswith("USB VID:PID=0403:6015"):  # FIDI FT230XS
-                    fidi_port.append(port[0])
-            self.portlist = fidi_port
+                    ftdi_port.append(port[0])
+            self.portlist = ftdi_port
 
     def __dex2str(self, dex):
         if dex < 0:
