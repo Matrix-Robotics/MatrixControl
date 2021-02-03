@@ -50,6 +50,12 @@ device1.setRC(1, 100) # set RCservo 1 to Angle 100
 device2.setMotor(2, 90) # set Motor 1 to Speed 90
 ```
 
+# Caution
+
+```diff
+- Make sure Raspberry pi's buad rate is equal to your MatrixController's. (Default buad rate is 115200) 
+```
+
 ## License
 
 MIT
