@@ -45,7 +45,9 @@ class BoardControl:
         try:
             from serial.tools.list_ports import comports
         except ImportError:
+            raise ImportError('Please install requirements.')
             return None
+
         if comports:
             com_ports_list = list(comports())
             _port_list = []
@@ -62,12 +64,14 @@ class BoardControl:
         else:
             return str(hex(dex).lstrip("0x"))
 
-    def __sendbuff(self, func, para=-1):
-        # TODO: Need to add exception
-        self.__port.write((func + self.__dex2str(para) + "\n").encode())
+    def __sendbuff(self, func_name:str, para:int):
+        if para is None:
+            raise TypeError('Second parameter should be integer, not None.')
+        self.__port.write((func_name + self.__dex2str(para) + "\n").encode())
     
     def __readbuff(self):
         tic = time.time()
+        ##!!## TODO Why double while
         while ((time.time() - tic) < self.__timeout):
             while self.__port.in_waiting:
                 self.__rxbuff = self.__port.readline().decode().rstrip("\r\n")
@@ -80,11 +84,8 @@ class BoardControl:
         elif _para >= self.MAX_ENCODE:
             return self.MAX_ENCODE
         else:
-            print('parameter error')
+            raise IndexError('Index out of range, param is an integer between 0 and {}'.format(self.MAX_ENCODE))
             return None
-    
-    def register(self, *device_type):
-        pass
 
     def setMOTOR(self, motor_port:int, pwm:int):
         """ Set Motor with specific socket and speed.
@@ -101,14 +102,14 @@ class BoardControl:
         else:
             # TODO break point
             _pwm = None
-            print('pwm is an integer between -101 to 101.')
+            raise IndexError('Index out of range, pwm is an integer between -101 to 101.')
         
         if motor_port in (1, 2):
             _buff = "{}.M{}_SET".format(self.protocol, motor_port)
             self.__sendbuff(eval(_buff), _pwm)
             time.sleep(self.MOTOR_WAIT)
         else:
-            print('motor_port options: 1 or 2 .')
+            raise IndexError('Index out of range, motor_port options: 1 or 2 .')
             return None
 
     def setRC(self, rc_port:int, angle:int):
@@ -124,12 +125,15 @@ class BoardControl:
             return None
 
     def releaseRC(self):
-        # TODO Only works on MATRIX Micro
+        if self.board_type == 'Mini':
+            raise ValueError('releaseRC only works on MATRIX Micro')
         self.__sendbuff(MicroP.RCRLS_SET)
 
     def setDIG(self, digital_port:int, logic:int):
         # logic is 0 or 1
-        # TODO Only works on MATRIX Mini
+        if self.board_type == 'Micro':
+            raise ValueError('setDIG only works on MATRIX Mini')
+
         _logic = self.__txEncode(logic)
         if digital_port in range(1, 5):
             _buff = "{}.D{}_SET".format(self.protocol, digital_port)
@@ -149,7 +153,9 @@ class BoardControl:
         return self.__rxbuff
 
     def setRGB(self, light_port, pwmR, pwmG, pwmB):
-        # Only works on MATRIX Mini
+        if self.board_type == 'Micro':
+            raise ValueError('setRGB only works on MATRIX Mini')
+
         _pwmR = self.__txEncode(pwmR)
         _pwmG = self.__txEncode(pwmG)
         _pwmB = self.__txEncode(pwmB)
@@ -164,7 +170,9 @@ class BoardControl:
             return None
 
     def getBTN(self, button_port):
-        # Only works on MATRIX Mini
+        if self.board_type == 'Micro':
+            raise ValueError('getBTN only works on MATRIX Mini')
+
         if button_port in range(1, 3):
             _buff = "{}.BTN{}_GET".format(self.protocol, button_port)
             self.__sendbuff(eval(_buff))
@@ -187,7 +195,9 @@ class BoardControl:
         return self.__rxbuff
     
     def getUR(self, ur_port):
-        # Only works on MATRIX Micro
+        if self.board_type == 'Mini':
+            raise ValueError('getUR only works on MATRIX Micro')
+
         _buff = "{}.URD{}_GET".format(self.protocol, button_port)
         if ur_port in range(1, 3):
             self.__sendbuff(_buff)
@@ -205,6 +215,3 @@ class BoardControl:
     def close(self):
         self.RST()
         self.__port.close()
-
-
-    
