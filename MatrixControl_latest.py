@@ -71,7 +71,6 @@ class BoardControl:
     
     def __readbuff(self):
         tic = time.time()
-        ##!!## TODO Why double while
         while ((time.time() - tic) < self.__timeout):
             while self.__port.in_waiting:
                 self.__rxbuff = self.__port.readline().decode().rstrip("\r\n")
@@ -132,6 +131,7 @@ class BoardControl:
             raise ValueError('releaseRC only works on MATRIX Micro')
         self.__sendbuff(MicroP.RCRLS_SET)
 
+    ##!!## TODO: protocal of Mini haven't be set yet.
     def setDIG(self, digital_port:int, logic:int):
         # logic is 0 or 1
         if self.board_type == 'Micro':
@@ -145,7 +145,7 @@ class BoardControl:
             raise IndexError('digital_port out of range, '
                 'MATRIX Mini digital_port is an integer from 1 to 4.')
             return None
-    ##!!## TODO: Check
+
     def getDIG(self, digital_port):
         _buff = "{}.D{}_GET".format(self.protocol, digital_port)
         if self.board_type == 'Mini' and digital_port in range(1, 5):
