@@ -1,4 +1,4 @@
-import time
+mport time
 import serial
 import MiniProtocol as MiniP
 import MicroProtocol as MicroP
@@ -65,6 +65,11 @@ class BoardControl:
             return str(hex(dex).lstrip("0x"))
 
     def __sendbuff(self, func_name:str, para:int):
+        """
+        Args:
+            func_name (str): Send buff via calling function name.
+            para (int): Corresponding value of function.
+        """
         if para is None:
             raise TypeError('Second parameter should be integer, not None.')
         self.__port.write((func_name + self.__dex2str(para) + "\n").encode())
@@ -86,7 +91,7 @@ class BoardControl:
                 'param is an integer between 0 and {}'.format(self.MAX_ENCODE))
             return None
 
-    def setMOTOR(self, motor_port:int, pwm:int):
+    def setMOTOR(self, motor_port, pwm):
         """ Set Motor with specific socket and speed.
         Args:
             motor_port (int): 
@@ -111,7 +116,12 @@ class BoardControl:
             raise IndexError('Index out of range, motor_port options: 1 or 2.')
             return None
 
-    def setRC(self, rc_port:int, angle:int):
+    def setRC(self, rc_port, angle):
+        """
+        Args:
+            rc_port (int)
+            angle (int)
+        """
         _angle = self.__txEncode(angle)
         _buff = "{}.RC{}_SET".format(self.protocol, rc_port)
 
@@ -132,7 +142,12 @@ class BoardControl:
         self.__sendbuff(MicroP.RCRLS_SET)
 
     ##!!## TODO: protocal of Mini haven't be set yet.
-    def setDIG(self, digital_port:int, logic:int):
+    def setDIG(self, digital_port, logic):
+        """
+        Args:
+            digital_port (int)
+            logic (int)
+        """
         # logic is 0 or 1
         if self.board_type == 'Micro':
             raise ValueError('setDIG only works on MATRIX Mini')
