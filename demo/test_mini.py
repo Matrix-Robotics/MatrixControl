@@ -40,19 +40,21 @@ try:
         device1.setRC(1, 0)
         time.sleep(t)
 
+        print("A1:", device1.getANG(1))
         print("A2:", device1.getANG(2))
         print("A3:", device1.getANG(3))
         device1.setMOTOR(1, 100)
         device1.setMOTOR(2, 100)
-
         time.sleep(t)
 
         device1.setMOTOR(1, -100)
         device1.setMOTOR(2, -100)
-
         time.sleep(t)
 
-#TODO KeyboardInterrupt is not working on mac.
+        device1.setMOTOR(1, 0)
+        device1.setMOTOR(2, 0)
+        time.sleep(t)
+
 except KeyboardInterrupt:
     device1.close()
     print('DeviceClose')
