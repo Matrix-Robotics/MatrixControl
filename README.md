@@ -3,6 +3,8 @@ Control API for any MATRIX controller base on python.
 
 ## Getting Started
 
+Notice: Support Python version: 3.5 and above.
+
 ### Step 1: Install Requirements
 
 ```shell
