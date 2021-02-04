@@ -78,13 +78,13 @@ class BoardControl:
 
     def __txEncode(self, para):
         _para = int(para)
-        
         if _para in range(0, self.MAX_ENCODE):
             return _para + self.PORT_ADJUST
         elif _para >= self.MAX_ENCODE:
             return self.MAX_ENCODE
         else:
-            raise IndexError('Index out of range, param is an integer between 0 and {}'.format(self.MAX_ENCODE))
+            raise IndexError('Index out of range, '
+                'param is an integer between 0 and {}'.format(self.MAX_ENCODE))
             return None
 
     def setMOTOR(self, motor_port:int, pwm:int):
@@ -100,16 +100,16 @@ class BoardControl:
         elif pwm > -1 and pwm < 101:
             _pwm = pwm + self.PORT_ADJUST
         else:
-            # TODO break point
             _pwm = None
-            raise IndexError('Index out of range, pwm is an integer between -101 to 101.')
+            raise IndexError('Index out of range, '
+                'pwm is an integer between -101 to 101.')
         
         if motor_port in (1, 2):
             _buff = "{}.M{}_SET".format(self.protocol, motor_port)
             self.__sendbuff(eval(_buff), _pwm)
             time.sleep(self.MOTOR_WAIT)
         else:
-            raise IndexError('Index out of range, motor_port options: 1 or 2 .')
+            raise IndexError('Index out of range, motor_port options: 1 or 2.')
             return None
 
     def setRC(self, rc_port:int, angle:int):
@@ -122,6 +122,9 @@ class BoardControl:
         elif self.board_type == 'Micro' and rc_port in range(1, 3):
             self.__sendbuff(eval(_buff), _angle)
         else:
+            raise IndexError('rc_port out of range, '
+                'MATRIX Mini digital_port is an integer from 1 to 4.'
+                'MATRIX Micro digital_port is an integer from 1 to 2.')
             return None
 
     def releaseRC(self):
@@ -139,15 +142,20 @@ class BoardControl:
             _buff = "{}.D{}_SET".format(self.protocol, digital_port)
             self.__sendbuff(eval(_buff), _logic)
         else:
-            print('digital_port out of range')
+            raise IndexError('digital_port out of range, '
+                'MATRIX Mini digital_port is an integer from 1 to 4.')
             return None
-
+    ##!!## TODO: Check
     def getDIG(self, digital_port):
-        if digital_port in range(1, 5):
-            _buff = "{}.D{}_GET".format(self.protocol, digital_port)
+        _buff = "{}.D{}_GET".format(self.protocol, digital_port)
+        if self.board_type == 'Mini' and digital_port in range(1, 5):
+            self.__sendbuff(eval(_buff))
+        elif self.board_type == 'Micro' and digital_port in range(1, 3):
             self.__sendbuff(eval(_buff))
         else:
-            print('parameter error')
+            raise IndexError('digital_port out of range, '
+                'MATRIX Mini  digital_port is an integer from 1 to 4.'
+                'MATRIX Micro  digital_port is an integer from 1 to 2.'
             return None
         self.__readbuff()
         return self.__rxbuff
@@ -166,7 +174,8 @@ class BoardControl:
             self.__sendbuff(eval(_buff), _pwmG)
             self.__sendbuff(eval(_buff), _pwmB)
         else:
-            print('light_port out of range')
+            raise IndexError('light_port out of range, '
+                'MATRIX Mini light_port options: 1 or 2.')
             return None
 
     def getBTN(self, button_port):
@@ -177,19 +186,22 @@ class BoardControl:
             _buff = "{}.BTN{}_GET".format(self.protocol, button_port)
             self.__sendbuff(eval(_buff))
         else:
-            print('parameter error')
+            raise IndexError('button_port out of range, '
+                'MATRIX Mini button_port options: 1 or 2.')
             return None
         self.__readbuff()
         return self.__rxbuff
 
     def getANG(self, analog_port):
         _buff = "{}.A{}_GET".format(self.protocol, button_port)
-        if device_type == 'Mini' and analog_port in range(0, 4):
+        if device_type == 'Mini' and analog_port in range(1, 4):
             self.__sendbuff(eval(_buff))
-        elif device_type == 'Micro' and analog_port in range(0, 3):
+        elif device_type == 'Micro' and analog_port in range(1, 3):
             self.__sendbuff(eval(_buff))
         else:
-            print('parameter error')
+            raise IndexError('analog_port out of range, '
+                'MATRIX Mini analog_port is an integer from 1 to 3; '
+                'MATRIX Micro analog_port is from 1 to 2.')
             return None
         self.__readbuff()
         return self.__rxbuff
@@ -202,7 +214,8 @@ class BoardControl:
         if ur_port in range(1, 3):
             self.__sendbuff(_buff)
         else:
-            print('parameter error')
+            raise IndexError('ur_port out of range, '
+                'MATRIX Micro ur_port is from 1 to 2.')
             return None
         self.__readbuff()
         return self.__rxbuff
