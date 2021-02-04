@@ -182,12 +182,13 @@ class BoardControl:
         _pwmR = self.__txEncode(pwmR)
         _pwmG = self.__txEncode(pwmG)
         _pwmB = self.__txEncode(pwmB)
-
         if light_port in range(1, 3):
-            _buff = "{}.RGB{}_SET".format(self.protocol, light_port)
-            self.__sendbuff(eval(_buff), _pwmR)
-            self.__sendbuff(eval(_buff), _pwmG)
-            self.__sendbuff(eval(_buff), _pwmB)
+            _r_buff = "{}.RGB{}R_SET".format(self.protocol, light_port)
+            _g_buff = "{}.RGB{}G_SET".format(self.protocol, light_port)
+            _b_buff = "{}.RGB{}B_SET".format(self.protocol, light_port)
+            self.__sendbuff(eval(_r_buff), _pwmR)
+            self.__sendbuff(eval(_g_buff), _pwmG)
+            self.__sendbuff(eval(_b_buff), _pwmB)
         else:
             raise IndexError('light_port out of range, '
                 'MATRIX Mini light_port options: 1 or 2.')
