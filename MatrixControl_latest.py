@@ -55,6 +55,8 @@ class BoardControl:
                 if port[2].startswith("USB VID:PID="+self.PID):  # FIDI FT230XS
                     _port_list.append(port[0])
             self.portlist = _port_list
+            if len(self.portlist) == 0:
+                raise RuntimeError("Cannot Read Device, please check your cable connection.")
     
     def __dex2str(self, dex):
         if dex < 0:
