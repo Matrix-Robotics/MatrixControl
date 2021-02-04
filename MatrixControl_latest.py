@@ -64,7 +64,7 @@ class BoardControl:
         else:
             return str(hex(dex).lstrip("0x"))
 
-    def __sendbuff(self, func_name, para):
+    def __sendbuff(self, func_name, para=-1):
         """
         Args:
             func_name (str): Send buff via calling function name.
@@ -209,10 +209,10 @@ class BoardControl:
         return self.__rxbuff
 
     def getANG(self, analog_port):
-        _buff = "{}.A{}_GET".format(self.protocol, button_port)
-        if device_type == 'Mini' and analog_port in range(1, 4):
+        _buff = "{}.A{}_GET".format(self.protocol, analog_port)
+        if self.board_type == 'Mini' and analog_port in range(1, 4):
             self.__sendbuff(eval(_buff))
-        elif device_type == 'Micro' and analog_port in range(1, 3):
+        elif self.board_type == 'Micro' and analog_port in range(1, 3):
             self.__sendbuff(eval(_buff))
         else:
             raise IndexError('analog_port out of range, '
