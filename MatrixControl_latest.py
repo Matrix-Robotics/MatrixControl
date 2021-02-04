@@ -4,11 +4,11 @@ import MiniProtocol as MiniP
 import MicroProtocol as MicroP
 
 class BoardControl:
-    def __init__(self, board_type, device_num, buad=115200, tout=0.1):
+    def __init__(self, device_num, board_type, buad=115200, tout=0.1):
         """Using buad rate and tout to control Matrix Mini board.
         Args:
             borad_type (str): options: "Mini" or "Micro"
-            num (int): Device number, eg: 0, 1, ...
+            device_num (int): Device number, eg: 0, 1, ...
             buad (int, optional): [buad rate]. Defaults to 115200.
             tout (float, optional): [Upper limit of time out, seconds]. 
                 Defaults to 0.1.
@@ -35,7 +35,7 @@ class BoardControl:
         self.__device_num = device_num
         self.__findPort()
         self.__buad = buad
-        self.__port = serial.Serial(self.portlist[self.__num], buad, timeout=tout)
+        self.__port = serial.Serial(self.portlist[self.__device_num], buad, timeout=tout)
         # Wait n sec for device to boot.
         time.sleep(self.BOOT_WAIT)
 
@@ -155,7 +155,7 @@ class BoardControl:
         else:
             raise IndexError('digital_port out of range, '
                 'MATRIX Mini  digital_port is an integer from 1 to 4.'
-                'MATRIX Micro  digital_port is an integer from 1 to 2.'
+                'MATRIX Micro  digital_port is an integer from 1 to 2.')
             return None
         self.__readbuff()
         return self.__rxbuff
@@ -222,7 +222,7 @@ class BoardControl:
     
     def RST(self):
         self.__port.close()
-        self.__port = serial.Serial(self.portlist[self.__num], self.__buad, timeout=self.__timeout)
+        self.__port = serial.Serial(self.portlist[self.__device_num], self.__buad, timeout=self.__timeout)
         time.sleep(2)
 
     def close(self):
