@@ -1,4 +1,4 @@
-mport time
+import time
 import serial
 import MiniProtocol as MiniP
 import MicroProtocol as MicroP
@@ -64,7 +64,7 @@ class BoardControl:
         else:
             return str(hex(dex).lstrip("0x"))
 
-    def __sendbuff(self, func_name:str, para:int):
+    def __sendbuff(self, func_name, para):
         """
         Args:
             func_name (str): Send buff via calling function name.
