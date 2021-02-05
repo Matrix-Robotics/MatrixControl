@@ -14,7 +14,7 @@ class Mini:
             tout (float, optional): [Upper limit of time out, seconds]. Defaults to 0.1.
         """
         # rxbuff: recieve buffer
-        self.__rxbuff = ''
+        self.__rxbuff = ""
         self.__timeout = tout
         self.__num = num
         self.__findPort()
@@ -25,19 +25,19 @@ class Mini:
 
     def setMOTOR(self, num, pwm):
         if pwm < 0 and pwm > -101:
-            _pwm = 255-(~pwm-1)
+            _pwm = 255 - (~pwm - 1)
         elif pwm > -1 and pwm < 101:
-            _pwm = pwm+1
+            _pwm = pwm + 1
         else:
             _pwm = None
-            print('parameter error')
+            print("parameter error")
 
         if num == 1:
             self.__sendbuff(MiniP.M1_SET, _pwm)
         elif num == 2:
             self.__sendbuff(MiniP.M2_SET, _pwm)
         else:
-            print('parameter error')
+            print("parameter error")
             return None
 
     def setRC(self, num, angle):
@@ -52,7 +52,7 @@ class Mini:
         elif num == 4:
             self.__sendbuff(MiniP.RC4_SET, _angle)
         else:
-            print('parameter error')
+            print("parameter error")
             return None
 
     def setDIG(self, num, logic):
@@ -67,7 +67,7 @@ class Mini:
         elif num == 4:
             self.__sendbuff(MiniP.D4_SET, _logic)
         else:
-            print('parameter error')
+            print("parameter error")
             return None
 
     def setRGB(self, num, pwmR, pwmG, pwmB):
@@ -84,7 +84,7 @@ class Mini:
             self.__sendbuff(MiniP.RGB2G_SET, _pwmG)
             self.__sendbuff(MiniP.RGB2B_SET, _pwmB)
         else:
-            print('parameter error')
+            print("parameter error")
             return None
 
     def getBTN(self, num):
@@ -93,7 +93,7 @@ class Mini:
         elif num == 2:
             self.__sendbuff(MiniP.BTN2_GET)
         else:
-            print('parameter error')
+            print("parameter error")
             return None
         self.__readbuff()
         return self.__rxbuff
@@ -108,7 +108,7 @@ class Mini:
         elif num == 4:
             self.__sendbuff(MiniP.D4_GET)
         else:
-            print('parameter error')
+            print("parameter error")
             return None
         self.__readbuff()
         return self.__rxbuff
@@ -121,14 +121,16 @@ class Mini:
         elif num == 3:
             self.__sendbuff(MiniP.A3_GET)
         else:
-            print('parameter error')
+            print("parameter error")
             return None
         self.__readbuff()
         return self.__rxbuff
 
     def RST(self):
         self.__port.close()
-        self.__port = serial.Serial(self.portlist[self.__num], self.__buad, timeout=self.__timeout)
+        self.__port = serial.Serial(
+            self.portlist[self.__num], self.__buad, timeout=self.__timeout
+        )
         time.sleep(2)
 
     def close(self):
@@ -154,7 +156,7 @@ class Mini:
         if dex < 0:
             return ""
         elif dex <= 15:
-            return "0"+str(hex(dex+1).lstrip("0x"))
+            return "0" + str(hex(dex + 1).lstrip("0x"))
         else:
             return str(hex(dex).lstrip("0x"))
 
@@ -163,7 +165,7 @@ class Mini:
 
     def __readbuff(self):
         tic = time.time()
-        while ((time.time() - tic) < self.__timeout):
+        while (time.time() - tic) < self.__timeout:
             while self.__port.in_waiting:
                 self.__rxbuff = int(self.__port.readline().decode().rstrip("\r\n"), 16)
 
@@ -172,10 +174,10 @@ class Mini:
         if _para > 254:
             return 255
         elif _para < 0:
-            print('parameter error')
+            print("parameter error")
             return None
         else:
-            return _para+1
+            return _para + 1
 
 
 class Micro:
@@ -187,7 +189,7 @@ class Micro:
             buad (int, optional): [buad rate]. Defaults to 115200.
             tout (float, optional): [tout]. Defaults to 0.1.
         """
-        self.__rxbuff = ''
+        self.__rxbuff = ""
         self.__timeout = tout
         self.__num = num
         self.__findPort()
@@ -198,12 +200,12 @@ class Micro:
 
     def setMOTOR(self, num, pwm):
         if pwm < 0 and pwm > -101:
-            _pwm = 255-(~pwm)
+            _pwm = 255 - (~pwm)
         elif pwm > -1 and pwm < 101:
             _pwm = pwm
         else:
             _pwm = None
-            print('parameter error')
+            print("parameter error")
         if num == 1:
             self.__sendbuff(MicroP.M1_SET, _pwm)
             # Waiting for device run motor
@@ -213,7 +215,7 @@ class Micro:
             # Waiting for device run motor
             time.sleep(0.01)
         else:
-            print('parameter error')
+            print("parameter error")
             return None
 
     def setRC(self, num, angle):
@@ -224,7 +226,7 @@ class Micro:
         elif num == 2:
             self.__sendbuff(MicroP.RC2_SET, _angle)
         else:
-            print('parameter error')
+            print("parameter error")
             return None
 
     def releaseRC(self):
@@ -236,7 +238,7 @@ class Micro:
         elif num == 2:
             self.__sendbuff(MicroP.D2_GET)
         else:
-            print('parameter error')
+            print("parameter error")
             return None
         self.__readbuff()
         return self.__rxbuff
@@ -247,7 +249,7 @@ class Micro:
         elif num == 2:
             self.__sendbuff(MicroP.A2_GET)
         else:
-            print('parameter error')
+            print("parameter error")
             return None
         self.__readbuff()
         return self.__rxbuff
@@ -258,14 +260,16 @@ class Micro:
         elif num == 2:
             self.__sendbuff(MicroP.URD2_GET)
         else:
-            print('parameter error')
+            print("parameter error")
             return None
         self.__readbuff()
         return self.__rxbuff
 
     def RST(self):
         self.__port.close()
-        self.__port = serial.Serial(self.portlist[self.__num], self.__buad, timeout=self.__timeout)
+        self.__port = serial.Serial(
+            self.portlist[self.__num], self.__buad, timeout=self.__timeout
+        )
         time.sleep(2)
 
     def close(self):
@@ -291,7 +295,7 @@ class Micro:
         if dex < 0:
             return ""
         elif dex <= 15:
-            return "0"+str(hex(dex+1).lstrip("0x"))
+            return "0" + str(hex(dex + 1).lstrip("0x"))
         else:
             return str(hex(dex).lstrip("0x"))
 
@@ -300,7 +304,7 @@ class Micro:
 
     def __readbuff(self):
         tic = time.time()
-        while ((time.time() - tic) < self.__timeout):
+        while (time.time() - tic) < self.__timeout:
             while self.__port.in_waiting:
                 self.__rxbuff = self.__port.readline().decode().rstrip("\r\n")
 
@@ -309,7 +313,7 @@ class Micro:
         if _para > 180:
             return 180
         elif _para < 0:
-            print('parameter error')
+            print("parameter error")
             return None
         else:
             return _para

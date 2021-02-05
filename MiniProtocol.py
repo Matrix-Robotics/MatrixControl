@@ -1,5 +1,3 @@
-
-
 M1_SET = "MINI01"
 M2_SET = "MINI02"
 RC1_SET = "MINI03"
