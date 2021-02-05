@@ -1,11 +1,14 @@
 import sys
-sys.path.insert(1, '../')
+
+sys.path.insert(1, "../")
 
 import time
+
 # from MatrixControl_latest import BoardControl
 # device1 = BoardControl(0, 'Micro')
 
 from MatrixControl import Micro
+
 device1 = Micro(0)
 
 t = 2
@@ -50,19 +53,19 @@ try:
         print("A2:", device1.getANG(2))
         # print("A3:", device1.getANG(3))
 
-        print('MOTOR up')
+        print("MOTOR up")
         device1.setMOTOR(1, 100)
         time.sleep(t)
         device1.setMOTOR(2, 100)
         time.sleep(t)
 
-        print('MOTOR down')
+        print("MOTOR down")
 
         # device1.setMOTOR(1, -100)
         # device1.setMOTOR(2, -100)
         # time.sleep(t)
 
-#TODO KeyboardInterrupt is not working on mac.
+# TODO KeyboardInterrupt is not working on mac.
 except KeyboardInterrupt:
     device1.close()
-    print('DeviceClose')
+    print("DeviceClose")

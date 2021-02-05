@@ -1,33 +1,34 @@
 import sys
-sys.path.insert(1, '../')
+
+sys.path.insert(1, "../")
 
 import time
 from MatrixControl_latest import BoardControl
 
-device1 = BoardControl(0, 'Mini')
+device1 = BoardControl(0, "Mini")
 t = 0.5
 limit = 100
 step = 5
 
 # while True:
-#     # if 
+#     # if
 #     print("BTN1:", device1.getBTN(1))
 #     time.sleep(t)
 
 try:
     # while True:
-        # pass
+    # pass
     for i in range(0, limit, step):
-        device1.setRGB(1, i, 0, limit-i)
-        device1.setRGB(2, i, 0, limit-i)
+        device1.setRGB(1, i, 0, limit - i)
+        device1.setRGB(2, i, 0, limit - i)
         time.sleep(t)
         for i in range(0, limit, step):
-            device1.setRGB(1, limit-i, i, 0)
-            device1.setRGB(2, limit-i, i, 0)
+            device1.setRGB(1, limit - i, i, 0)
+            device1.setRGB(2, limit - i, i, 0)
             time.sleep(t)
         for i in range(0, limit, step):
-            device1.setRGB(1, 0, limit-i, i)
-            device1.setRGB(2, 0, limit-i, i)
+            device1.setRGB(1, 0, limit - i, i)
+            device1.setRGB(2, 0, limit - i, i)
             time.sleep(t)
 
         print("BTN1:", device1.getBTN(1))
@@ -61,4 +62,4 @@ try:
 
 except KeyboardInterrupt:
     device1.close()
-    print('DeviceClose')
+    print("DeviceClose")
