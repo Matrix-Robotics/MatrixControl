@@ -75,23 +75,29 @@ class BoardControl:
         if para is None:
             raise TypeError('Second parameter should be integer, not None.')
         self.__port.write((func_name + self.__dex2str(para) + "\n").encode())
-    
+        time.sleep(0.2)
+
     def __readbuff(self):
+        # MATRIX Micro buff is Hexadecimal System 
         tic = time.time()
         while ((time.time() - tic) < self.__timeout):
             while self.__port.in_waiting:
-                self.__rxbuff = self.__port.readline().decode().rstrip("\r\n")
+                if self.board_type == 'Mini':
+                    self.__rxbuff = int(self.__port.readline().decode().rstrip("\r\n"), 16)
+                else:
+                    self.__rxbuff = self.__port.readline().decode().rstrip("\r\n")
 
     def __txEncode(self, para):
         _para = int(para)
-        if _para in range(0, self.MAX_ENCODE):
-            return _para + self.PORT_ADJUST
-        elif _para >= self.MAX_ENCODE:
+        if _para > self.MAX_ENCODE - self.PORT_ADJUST:
             return self.MAX_ENCODE
-        else:
+        elif _para < 0:
             raise IndexError('Index out of range, '
                 'param is an integer between 0 and {}'.format(self.MAX_ENCODE))
+            print('parameter error')
             return None
+        else:
+            return _para + self.PORT_ADJUST
 
     def setMOTOR(self, motor_port, pwm):
         """ Set Motor with specific socket and speed.

@@ -9,6 +9,10 @@ t = 0.5
 limit = 100
 step = 5
 
+# while True:
+#     # if 
+#     print("BTN1:", device1.getBTN(1))
+#     time.sleep(t)
 
 try:
     # while True:
