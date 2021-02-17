@@ -11,7 +11,8 @@ class Mini:
         Args:
             num (int): Device number, eg: 0, 1, ...
             buad (int, optional): [buad rate]. Defaults to 115200.
-            tout (float, optional): [Upper limit of time out, seconds]. Defaults to 0.1.
+            tout (float, optional): [Upper limit of time out, seconds].
+            Defaults to 0.1.
         """
         # rxbuff: recieve buffer
         self.__rxbuff = ""
@@ -19,7 +20,8 @@ class Mini:
         self.__num = num
         self.__findPort()
         self.__buad = buad
-        self.__port = serial.Serial(self.portlist[self.__num], buad, timeout=tout)
+        self.__port = serial.Serial(
+            self.portlist[self.__num], buad, timeout=tout)
         # Wait 2 sec for Mini to boot.
         time.sleep(2)
 
@@ -167,7 +169,8 @@ class Mini:
         tic = time.time()
         while (time.time() - tic) < self.__timeout:
             while self.__port.in_waiting:
-                self.__rxbuff = int(self.__port.readline().decode().rstrip("\r\n"), 16)
+                self.__rxbuff = int(
+                    self.__port.readline().decode().rstrip("\r\n"), 16)
 
     def __txEncode(self, para):
         _para = int(para)
@@ -194,7 +197,8 @@ class Micro:
         self.__num = num
         self.__findPort()
         self.__buad = buad
-        self.__port = serial.Serial(self.portlist[self.__num], buad, timeout=tout)
+        self.__port = serial.Serial(
+            self.portlist[self.__num], buad, timeout=tout)
         # Wait 0.5 sec for Mini to boot.
         time.sleep(0.5)
 
