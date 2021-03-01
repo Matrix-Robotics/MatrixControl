@@ -49,7 +49,6 @@ class BoardControl:
             from serial.tools.list_ports import comports
         except ImportError:
             raise ImportError("Please install requirements.")
-            return None
 
         if comports:
             com_ports_list = list(comports())
@@ -79,20 +78,19 @@ class BoardControl:
         """
         if para is None:
             raise TypeError("Second parameter should be integer, not None.")
-        self.__port.write((func_name + self.__dex2str(para) + "\n").encode())
-        time.sleep(0.2)
+        # self.__port.write((func_name + self.__dex2str(para) + "\n").encode())
 
     def __readbuff(self):
         # MATRIX Micro buff is Hexadecimal System
         tic = time.time()
-        while (time.time() - tic) < self.__timeout:
-            while self.__port.in_waiting:
-                if self.board_type == "Mini":
-                    self.__rxbuff = int(
-                        self.__port.readline().decode().rstrip("\r\n"), 16
-                    )
-                else:
-                    self.__rxbuff = self.__port.readline().decode().rstrip("\r\n")
+        # while (time.time() - tic) < self.__timeout:
+        #     while self.__port.in_waiting:
+        #         if self.board_type == "Mini":
+        #             self.__rxbuff = int(
+        #                 self.__port.readline().decode().rstrip("\r\n"), 16
+        #             )
+        #         else:
+        #             self.__rxbuff = self.__port.readline().decode().rstrip("\r\n")
 
     def __txEncode(self, para):
         _para = int(para)
@@ -103,8 +101,6 @@ class BoardControl:
                 "Index out of range, "
                 "param is an integer between 0 and {}".format(self.MAX_ENCODE)
             )
-            print("parameter error")
-            return None
         else:
             return _para + self.PORT_ADJUST
 
@@ -132,7 +128,6 @@ class BoardControl:
             time.sleep(self.MOTOR_WAIT)
         else:
             raise IndexError("Index out of range, motor_port options: 1 or 2.")
-            return None
 
     def setRC(self, rc_port, angle):
         """
@@ -154,14 +149,13 @@ class BoardControl:
                 "MATRIX Mini digital_port is an integer from 1 to 4."
                 "MATRIX Micro digital_port is an integer from 1 to 2."
             )
-            return None
 
     def releaseRC(self):
         if self.board_type == "Mini":
             raise ValueError("releaseRC only works on MATRIX Micro")
         self.__sendbuff(MicroP.RCRLS_SET)
 
-    ##!!## TODO: protocal of Mini haven't be set yet.
+    # !!## TODO: protocal of Mini haven't be set yet.
     def setDIG(self, digital_port, logic):
         """
         Args:
@@ -181,7 +175,6 @@ class BoardControl:
                 "digital_port out of range, "
                 "MATRIX Mini digital_port is an integer from 1 to 4."
             )
-            return None
 
     def getDIG(self, digital_port):
         _buff = "{}.D{}_GET".format(self.protocol, digital_port)
@@ -195,7 +188,6 @@ class BoardControl:
                 "MATRIX Mini  digital_port is an integer from 1 to 4."
                 "MATRIX Micro  digital_port is an integer from 1 to 2."
             )
-            return None
         self.__readbuff()
         return self.__rxbuff
 
@@ -217,7 +209,6 @@ class BoardControl:
             raise IndexError(
                 "light_port out of range, " "MATRIX Mini light_port options: 1 or 2."
             )
-            return None
 
     def getBTN(self, button_port):
         if self.board_type == "Micro":
@@ -230,7 +221,7 @@ class BoardControl:
             raise IndexError(
                 "button_port out of range, " "MATRIX Mini button_port options: 1 or 2."
             )
-            return None
+
         self.__readbuff()
         return self.__rxbuff
 
@@ -246,7 +237,6 @@ class BoardControl:
                 "MATRIX Mini analog_port is an integer from 1 to 3; "
                 "MATRIX Micro analog_port is from 1 to 2."
             )
-            return None
         self.__readbuff()
         return self.__rxbuff
 
@@ -254,22 +244,20 @@ class BoardControl:
         if self.board_type == "Mini":
             raise ValueError("getUR only works on MATRIX Micro")
 
-        _buff = "{}.URD{}_GET".format(self.protocol, button_port)
+        _buff = "{}.URD{}_GET".format(self.protocol, ur_port)
         if ur_port in range(1, 3):
             self.__sendbuff(_buff)
         else:
             raise IndexError(
                 "ur_port out of range, " "MATRIX Micro ur_port is from 1 to 2."
             )
-            return None
         self.__readbuff()
         return self.__rxbuff
 
     def RST(self):
         self.__port.close()
         self.__port = serial.Serial(
-            self.portlist[self.__device_num], self.__buad, timeout=self.__timeout
-        )
+            self.portlist[self.__device_num], self.__buad, timeout=self.__timeout)
         time.sleep(2)
 
     def close(self):
