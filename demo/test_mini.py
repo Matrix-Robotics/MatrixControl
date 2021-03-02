@@ -4,16 +4,19 @@ sys.path.insert(1, "../")
 
 import time
 from MatrixControl_latest import BoardControl
+# from MatrixControl import Mini
+# device1 = Mini(0)
 
 device1 = BoardControl(0, "Mini")
+
 t = 0.5
 limit = 100
 step = 5
 
 # while True:
-#     # if
-#     print("BTN1:", device1.getBTN(1))
-#     time.sleep(t)
+    # if
+    # print("BTN1:", device1.getBTN(1))
+    # time.sleep(t)
 
 try:
     # while True:

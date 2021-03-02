@@ -3,10 +3,13 @@ sys.path.insert(1, "../")
 
 import time
 from MatrixControl_latest import BoardControl
+# from MatrixControl import Mini
 
 class RobotControl():
     def __init__(self):
         self.device = BoardControl(0, "Mini")
+        # self.device = Mini(0)
+
         self.limit = 100
         self.step = 5
 
@@ -45,17 +48,17 @@ rc = RobotControl()
 
 ## Use Case
 
-# while True:
-#     c = raw_input("Input direction:")
+while True:
+    c = raw_input("Input direction:")
 
-#     if c == 'w':
-#         rc.walk_forward()
-#     elif c == 's':
-#         rc.walk_backward()
-#     elif c == 'a':
-#         rc.turn_left()
-#     elif c == 'd':
-#         rc.turn_right()
-#     elif c == 'z':
-#         rc.stop()
+    if c == 'w':
+        rc.walk_forward()
+    elif c == 's':
+        rc.walk_backward()
+    elif c == 'a':
+        rc.turn_left()
+    elif c == 'd':
+        rc.turn_right()
+    elif c == 'z':
+        rc.stop()
 
