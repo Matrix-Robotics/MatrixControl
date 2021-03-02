@@ -1,7 +1,7 @@
 import time
 import serial
-import MiniProtocol as MiniP
-import MicroProtocol as MicroP
+from MiniProtocol_latest import MiniP
+from MicroProtocol_latest import MicroP
 
 
 class BoardControl:
@@ -16,14 +16,14 @@ class BoardControl:
         """
         self.board_type = board_type
         if self.board_type == "Mini":
-            self.protocol = "MiniP"
+            self.protocol = MiniP
             self.PORT_ADJUST = 1
             self.MAX_ENCODE = 255
             self.BOOT_WAIT = 2
             self.MOTOR_WAIT = 0
             self.PID = "0403:6015"
         else:
-            self.protocol = "MicroP"
+            self.protocol = MicroP
             self.PORT_ADJUST = 0
             self.MAX_ENCODE = 180
             self.BOOT_WAIT = 0.5
@@ -78,19 +78,23 @@ class BoardControl:
         """
         if para is None:
             raise TypeError("Second parameter should be integer, not None.")
-        # self.__port.write((func_name + self.__dex2str(para) + "\n").encode())
+        self.__port.write((func_name + self.__dex2str(para) + "\n").encode())
 
     def __readbuff(self):
         # MATRIX Micro buff is Hexadecimal System
         tic = time.time()
-        # while (time.time() - tic) < self.__timeout:
-        #     while self.__port.in_waiting:
-        #         if self.board_type == "Mini":
-        #             self.__rxbuff = int(
-        #                 self.__port.readline().decode().rstrip("\r\n"), 16
-        #             )
-        #         else:
-        #             self.__rxbuff = self.__port.readline().decode().rstrip("\r\n")
+        INVALID_PORTACOL_FLAG = False
+        while (time.time() - tic) < self.__timeout and INVALID_PORTACOL_FLAG:
+            while self.__port.in_waiting:
+                try:
+                    _protocol = self.__port.readline().decode().rstrip("\r\n")
+                    if self.board_type == "Mini":
+                        self.__rxbuff = int(_protocol, 16)
+                    else:
+                        self.__rxbuff = _protocol
+                except ValueError:
+                    INVALID_PORTACOL_FLAG = True
+                    pass
 
     def __txEncode(self, para):
         _para = int(para)
@@ -103,6 +107,7 @@ class BoardControl:
             )
         else:
             return _para + self.PORT_ADJUST
+
 
     def setMOTOR(self, motor_port, pwm):
         """ Set Motor with specific socket and speed.
@@ -123,8 +128,8 @@ class BoardControl:
             )
 
         if motor_port in (1, 2):
-            _buff = "{}.M{}_SET".format(self.protocol, motor_port)
-            self.__sendbuff(eval(_buff), _pwm)
+            _buff = "M{}_SET".format(motor_port)
+            self.__sendbuff(self.protocol[_buff], _pwm)
             time.sleep(self.MOTOR_WAIT)
         else:
             raise IndexError("Index out of range, motor_port options: 1 or 2.")
@@ -136,13 +141,13 @@ class BoardControl:
             angle (int)
         """
         _angle = self.__txEncode(angle)
-        _buff = "{}.RC{}_SET".format(self.protocol, rc_port)
+        _buff = "RC{}_SET".format(rc_port)
 
         if self.board_type == "Mini" and rc_port in range(1, 5):
-            self.__sendbuff(eval(_buff), _angle)
+            self.__sendbuff(self.protocol[_buff], _angle)
 
         elif self.board_type == "Micro" and rc_port in range(1, 3):
-            self.__sendbuff(eval(_buff), _angle)
+            self.__sendbuff(self.protocol[_buff], _angle)
         else:
             raise IndexError(
                 "rc_port out of range, "
@@ -155,21 +160,20 @@ class BoardControl:
             raise ValueError("releaseRC only works on MATRIX Micro")
         self.__sendbuff(MicroP.RCRLS_SET)
 
-    # !!## TODO: protocal of Mini haven't be set yet.
+    # !!## TODO: protocol of Mini haven't be set yet.
     def setDIG(self, digital_port, logic):
         """
         Args:
             digital_port (int)
-            logic (int)
+            logic (int) is 0 or 1
         """
-        # logic is 0 or 1
         if self.board_type == "Micro":
             raise ValueError("setDIG only works on MATRIX Mini")
 
         _logic = self.__txEncode(logic)
         if digital_port in range(1, 5):
-            _buff = "{}.D{}_SET".format(self.protocol, digital_port)
-            self.__sendbuff(eval(_buff), _logic)
+            _buff = "D{}_SET".format(digital_port)
+            self.__sendbuff(self.protocol[_buff], _logic)
         else:
             raise IndexError(
                 "digital_port out of range, "
@@ -177,11 +181,11 @@ class BoardControl:
             )
 
     def getDIG(self, digital_port):
-        _buff = "{}.D{}_GET".format(self.protocol, digital_port)
+        _buff = "D{}_GET".format(digital_port)
         if self.board_type == "Mini" and digital_port in range(1, 5):
-            self.__sendbuff(eval(_buff))
+            self.__sendbuff(self.protocol[_buff])
         elif self.board_type == "Micro" and digital_port in range(1, 3):
-            self.__sendbuff(eval(_buff))
+            self.__sendbuff(self.protocol[_buff])
         else:
             raise IndexError(
                 "digital_port out of range, "
@@ -199,12 +203,12 @@ class BoardControl:
         _pwmG = self.__txEncode(pwmG)
         _pwmB = self.__txEncode(pwmB)
         if light_port in range(1, 3):
-            _r_buff = "{}.RGB{}R_SET".format(self.protocol, light_port)
-            _g_buff = "{}.RGB{}G_SET".format(self.protocol, light_port)
-            _b_buff = "{}.RGB{}B_SET".format(self.protocol, light_port)
-            self.__sendbuff(eval(_r_buff), _pwmR)
-            self.__sendbuff(eval(_g_buff), _pwmG)
-            self.__sendbuff(eval(_b_buff), _pwmB)
+            _r_buff = "RGB{}R_SET".format(light_port)
+            _g_buff = "RGB{}G_SET".format(light_port)
+            _b_buff = "RGB{}B_SET".format(light_port)
+            self.__sendbuff(self.protocol[_r_buff], _pwmR)
+            self.__sendbuff(self.protocol[_g_buff], _pwmG)
+            self.__sendbuff(self.protocol[_b_buff], _pwmB)
         else:
             raise IndexError(
                 "light_port out of range, " "MATRIX Mini light_port options: 1 or 2."
@@ -215,8 +219,8 @@ class BoardControl:
             raise ValueError("getBTN only works on MATRIX Mini")
 
         if button_port in range(1, 3):
-            _buff = "{}.BTN{}_GET".format(self.protocol, button_port)
-            self.__sendbuff(eval(_buff))
+            _buff = "BTN{}_GET".format(button_port)
+            self.__sendbuff(self.protocol[_buff])
         else:
             raise IndexError(
                 "button_port out of range, " "MATRIX Mini button_port options: 1 or 2."
@@ -226,11 +230,11 @@ class BoardControl:
         return self.__rxbuff
 
     def getANG(self, analog_port):
-        _buff = "{}.A{}_GET".format(self.protocol, analog_port)
+        _buff = "A{}_GET".format(analog_port)
         if self.board_type == "Mini" and analog_port in range(1, 4):
-            self.__sendbuff(eval(_buff))
+            self.__sendbuff(self.protocol[_buff])
         elif self.board_type == "Micro" and analog_port in range(1, 3):
-            self.__sendbuff(eval(_buff))
+            self.__sendbuff(self.protocol[_buff])
         else:
             raise IndexError(
                 "analog_port out of range, "
@@ -244,9 +248,9 @@ class BoardControl:
         if self.board_type == "Mini":
             raise ValueError("getUR only works on MATRIX Micro")
 
-        _buff = "{}.URD{}_GET".format(self.protocol, ur_port)
+        _buff = "URD{}_GET".format(ur_port)
         if ur_port in range(1, 3):
-            self.__sendbuff(_buff)
+            self.__sendbuff(self.protocol[_buff])
         else:
             raise IndexError(
                 "ur_port out of range, " "MATRIX Micro ur_port is from 1 to 2."
