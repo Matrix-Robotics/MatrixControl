@@ -2,7 +2,7 @@ import sys
 sys.path.insert(1, "../")
 
 import time
-from MatrixControl_latest import BoardControl
+from MatrixControl import BoardControl
 # from MatrixControl import Mini
 
 class RobotControl():
@@ -49,7 +49,7 @@ rc = RobotControl()
 ## Use Case
 
 while True:
-    c = raw_input("Input direction:")
+    c = input("Input direction:")
 
     if c == 'w':
         rc.walk_forward()

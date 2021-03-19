@@ -4,7 +4,7 @@ sys.path.insert(1, "../")
 
 import time
 
-# from MatrixControl_latest import BoardControl
+# from MatrixControl import BoardControl
 # device1 = BoardControl(0, 'Micro')
 
 from MatrixControl import Micro
