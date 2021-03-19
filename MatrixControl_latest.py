@@ -1,7 +1,7 @@
 import time
 import serial
-from MiniProtocol import MiniP
-from MicroProtocol import MicroP
+from MiniProtocol_latest import MiniP
+from MicroProtocol_latest import MicroP
 
 
 class BoardControl:
