@@ -41,10 +41,10 @@ You can use MatrixControl library to control any MATRIX controller via any devic
 ```python
 from MatrixControl import Device
 
-device1 = Device(0, "Micro", 115200) # set the first device to Micro (Can be either Micro or Mini)
+device1 = Device(0, "Micro", 115200) # set the first device to Micro (Can choose either Micro or Mini)
                                            # default buad is 115200
                                            
-device2 = Device(1, "Mini", 115200)  # set the second device to Mini (Can be either Micro or Mini)
+device2 = Device(1, "Mini", 115200)  # set the second device to Mini (Can choose either Micro or Mini)
                                            # default buad is 115200
 
 device1.setRC(1, 100) # set RCservo 1 to Angle 100
