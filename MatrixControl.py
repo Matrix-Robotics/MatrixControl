@@ -4,7 +4,7 @@ from MiniProtocol import MiniP
 from MicroProtocol import MicroP
 
 
-class BoardControl:
+class Device:
     def __init__(self, device_num, board_type, buad=115200, tout=0.1):
         """Using buad rate and tout to control Matrix Mini board.
         Args:
@@ -59,7 +59,7 @@ class BoardControl:
             self.portlist = _port_list
             if len(self.portlist) == 0:
                 raise RuntimeError(
-                    "Cannot Read Device, please check your cable connection."
+                    "Cannot Read Device, please check your cable and device: {}. ".format(self.board_type)
                 )
 
     def __dex2str(self, dex):
