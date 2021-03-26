@@ -1,8 +1,11 @@
 import time
 import serial
-from MiniProtocol import MiniP
-from MicroProtocol import MicroP
-
+try:
+    from MiniProtocol import MiniP
+    from MicroProtocol import MicroP
+except ModuleNotFoundError:
+    from .MiniProtocol import MiniP
+    from .MicroProtocol import MicroP
 
 class Device:
     def __init__(self, device_num, board_type, buad=115200, tout=0.1):
