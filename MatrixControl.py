@@ -1,11 +1,12 @@
 import time
 import serial
 try:
-    from MiniProtocol import MiniP
-    from MicroProtocol import MicroP
+    from Protocol import MiniP
+    from Protocol import MicroP
 except ModuleNotFoundError:
-    from .MiniProtocol import MiniP
-    from .MicroProtocol import MicroP
+    from .Protocol import MiniP
+    from .Protocol import MicroP
+
 
 class Device:
     def __init__(self, device_num, board_type, buad=115200, tout=0.1):
@@ -14,8 +15,8 @@ class Device:
             borad_type (str): options: "Mini" or "Micro"
             device_num (int): Device number, eg: 0, 1, ...
             buad (int, optional): [buad rate]. Defaults to 115200.
-            tout (float, optional): [Upper limit of time out, seconds]. 
-                Defaults to 0.1.
+            tout (float, optional): [Upper limit of time out, seconds].
+            Defaults to 0.1.
         """
         self.board_type = board_type
         if self.board_type == "Mini":
@@ -111,11 +112,10 @@ class Device:
         else:
             return _para + self.PORT_ADJUST
 
-
     def setMOTOR(self, motor_port, pwm):
         """ Set Motor with specific socket and speed.
         Args:
-            motor_port (int): 
+            motor_port (int):
                 motor_port is corresponding with M1, M2 socket on board.
             pwm (int): Speed of motor.
         """
