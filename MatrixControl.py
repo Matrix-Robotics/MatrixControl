@@ -1,12 +1,9 @@
 import time
 import serial
 try:
-    from Protocol import MiniP
-    from Protocol import MicroP
+    from Protocol import MiniP, MicroP
 except ModuleNotFoundError:
-    from .Protocol import MiniP
-    from .Protocol import MicroP
-
+    from .Protocol import MiniP, MicroP
 
 class Device:
     def __init__(self, device_num, board_type, buad=115200, tout=0.1):
@@ -116,7 +113,7 @@ class Device:
         """ Set Motor with specific socket and speed.
         Args:
             motor_port (int):
-                motor_port is corresponding with M1, M2 socket on board.
+                motor_port is corresponding with M1, M2 sockets on board.
             pwm (int): Speed of motor.
         """
 
@@ -140,8 +137,9 @@ class Device:
     def setRC(self, rc_port, angle):
         """
         Args:
-            rc_port (int)
-            angle (int)
+            rc_port (int):
+                rc_port is corresponding with RC1, RC2... sockets on board.
+            angle (int): Angle of RC motor.
         """
         _angle = self.__txEncode(angle)
         _buff = "RC{}_SET".format(rc_port)
@@ -163,12 +161,12 @@ class Device:
             raise ValueError("releaseRC only works on MATRIX Micro")
         self.__sendbuff(MicroP.RCRLS_SET)
 
-    # !!## TODO: protocol of Mini haven't be set yet.
+    # !!## TODO: This protocol of Mini haven't be set yet.
     def setDIG(self, digital_port, logic):
         """
         Args:
             digital_port (int)
-            logic (int) is 0 or 1
+            logic (int): logic is GPIO output, eithrt 0 or 1.
         """
         if self.board_type == "Micro":
             raise ValueError("setDIG only works on MATRIX Mini")
