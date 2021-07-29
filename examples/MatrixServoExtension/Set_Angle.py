@@ -5,14 +5,14 @@ sys.path.insert(0, os.path.abspath("../.."))
 from MatrixControl import Device
 
 Mini1 = Device(0, "Mini", 115200)
-Mini1.SE1 = I2C(1,"ServoExtension")
+Mini1.SetI2C(1, "ServoExtension")
 
 while True:
     print("===============================================================")
 
     channel = 1
     angle = 0
-    Mini1.SE1.setAngle(channel, angle)
+    Mini1.I2C1.setAngle(channel, angle)
     print("set channel " + str(channel) + " to " + str(angle))
     time.sleep(0.25)
 
