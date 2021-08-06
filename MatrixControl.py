@@ -5,11 +5,12 @@ try:
     from Protocol import MiniP, MicroP
 except ModuleNotFoundError:
     from .Protocol import MiniP, MicroP
+from i2c.color_sensor import ColorSensor
+from i2c.servo_extension import ServoExtension
+from i2c.motor_extension import MotorExtension
 
 
 class Device(object):
-    # __slots__ = ()
-
     def __init__(self, device_num, board_type, buad=115200, tout=0.1):
         """Using buad rate and tout to control Matrix Mini board.
         Args:
@@ -19,7 +20,7 @@ class Device(object):
             tout (float, optional): [Upper limit of time out, seconds].
             Defaults to 0.1.
         """
-        
+
         self.board_type = board_type
         if self.board_type == "Mini":
             self.protocol = MiniP
@@ -36,10 +37,11 @@ class Device(object):
             self.MOTOR_WAIT = 0.01
             self.PID = "0D28:0204"
 
-        # self.I2C1 = I2C(1, self)
-        # self.I2C2 = I2C(2, self)
-        # self.I2C3 = I2C(3, self)
-        # self.I2C4 = I2C(4, self)
+        self._i2c_devices = {
+            "ColorSensor": ColorSensor,
+            "ServoExtension": ServoExtension,
+            "MotorExtension": MotorExtension,
+        }
 
         # rxbuff: recieve buffer
         self._rxbuff = ""
@@ -266,58 +268,5 @@ class Device(object):
         self.RST()
         self._port.close()
 
-
-# def getColor(self, color):
-#     # color options: R, G, B, C, M, Y, K
-#     if self.dev.board_type == "Micro":
-#         raise ValueError("getColor only works on MATRIX Mini")
-#     _buff = "I2C{}_GET_COLOR{}".format(self.i2c_port, color)
-#     self.dev._sendbuff(self.dev.protocol[_buff])
-#     self.dev._readbuff()
-#     return self.dev._rxbuff
-
-# def getGrayscale(self):
-#     if self.dev.board_type == "Micro":
-#         raise ValueError("getGrayscale only works on MATRIX Mini")
-#     _buff = "I2C{}_GET_GRAYSCALE".format(self.i2c_port)
-#     self.dev._sendbuff(self.dev.protocol[_buff])
-#     self.dev._readbuff()
-#     return self.dev._rxbuff
-
-# def getColorNumber(self):
-#     if self.dev.board_type == "Micro":
-#         raise ValueError("getColorNumber only works on MATRIX Mini")
-#     _buff = "I2C{}_GET_COLORNUMBER".format(self.i2c_port)
-#     self.dev._sendbuff(self.dev.protocol[_buff])
-#     self.dev._readbuff()
-#     return self.dev._rxbuff
-
-# def setAngle(self, channel, angle):
-#     # channel options: from 1 to 8
-#     if self.dev.board_type == "Micro":
-#         raise ValueError("setAngle only works on MATRIX Mini")
-#     _angle = self.dev._txEncode(angle)
-#     _buff = "I2C{}_SETANGLE_CH{}".format(self.i2c_port, channel)
-#     self.dev._sendbuff(self.dev.protocol[_buff], _angle)
-#     self.dev._readbuff()
-#     return self.dev._rxbuff
-
-# def ChannelRelease(self, channel):
-#     # channel options: from 1 to 8
-#     if self.dev.board_type == "Micro":
-#         raise ValueError("ChannelRelease only works on MATRIX Mini")
-
-#     _buff = "I2C{}_CHRELEASE_CH{}".format(self.i2c_port, channel)
-#     self.dev._sendbuff(self.dev.protocol[_buff], 1)
-#     self.dev._readbuff()
-#     return self.dev._rxbuff
-
-# def setPWM(self, channel, pwm):
-#     # channel options: from 1 to 8
-#     if self.dev.board_type == "Micro":
-#         raise ValueError("setAngle only works on MATRIX Mini")
-#     _angle = self.dev._txEncode(pwm)
-#     _buff = "I2C{}_SETPWM_CH{}".format(self.i2c_port, channel)
-#     self.dev._sendbuff(self.dev.protocol[_buff], _angle)
-#     self.dev._readbuff()
-#     return self.dev._rxbuff
+    def SetI2C(self, port_num, device):
+        setattr(self, "I2C{}".format(port_num), self._i2c_devices[device](port_num, self))

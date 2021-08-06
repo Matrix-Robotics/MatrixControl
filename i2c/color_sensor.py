@@ -1,4 +1,8 @@
 class ColorSensor:
+    def __init__(self, i2c_port, dev):
+        self.i2c_port = i2c_port
+        self.dev = dev
+
     def getColor(self, color):
         # color options: R, G, B, C, M, Y, K
         if self.dev.board_type == "Micro":
