@@ -6,6 +6,7 @@ try:
 except ModuleNotFoundError:
     from .Protocol import MiniP, MicroP
 from i2c.color_sensor import ColorSensor
+from i2c.motion_sensor import MotionSensor
 from i2c.servo_extension import ServoExtension
 from i2c.motor_extension import MotorExtension
 
@@ -37,8 +38,9 @@ class Device(object):
             self.MOTOR_WAIT = 0.01
             self.PID = "0D28:0204"
 
-        self._i2c_devices = {
+        self.i2c_devices = {
             "ColorSensor": ColorSensor,
+            "MotionSensor": MotionSensor,
             "ServoExtension": ServoExtension,
             "MotorExtension": MotorExtension,
         }
@@ -97,7 +99,14 @@ class Device(object):
         tic = time.time()
         while (time.time() - tic) < self._timeout:
             while self._port.in_waiting:
-                self._rxbuff = int(self._port.readline().decode().rstrip("\r\n"), 16)
+                UARTbuffer = self._port.readline()
+                if len(UARTbuffer) == 10:
+                    UARTbuffer = UARTbuffer[4:]
+                    self._rxbuff = int(UARTbuffer.decode().rstrip("\r\n"), 16) - 65536
+                    if abs(self._rxbuff==255): 
+                        self._rxbuff = 0
+                else:
+                    self._rxbuff = int(UARTbuffer.decode().rstrip("\r\n"), 16)
 
     def _txEncode(self, para):
         _para = int(para)
@@ -269,4 +278,7 @@ class Device(object):
         self._port.close()
 
     def SetI2C(self, port_num, device):
-        setattr(self, "I2C{}".format(port_num), self._i2c_devices[device](port_num, self))
+        try:
+            setattr(self, "I2C{}".format(port_num), self.i2c_devices[device](port_num, self))
+        except KeyError:
+            raise KeyError("Please Add "+ str(device) + "into i2c_devices list")
