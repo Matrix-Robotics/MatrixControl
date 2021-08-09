@@ -10,5 +10,3 @@ class MotorExtension:
         _angle = self.dev._txEncode(pwm)
         _buff = "I2C{}_SETPWM_CH{}".format(self.i2c_port, channel)
         self.dev._sendbuff(self.dev.protocol[_buff], _angle)
-        self.dev._readbuff()
-        return self.dev._rxbuff

@@ -100,13 +100,7 @@ class Device(object):
         while (time.time() - tic) < self._timeout:
             while self._port.in_waiting:
                 UARTbuffer = self._port.readline()
-                if len(UARTbuffer) == 10:
-                    UARTbuffer = UARTbuffer[4:]
-                    self._rxbuff = int(UARTbuffer.decode().rstrip("\r\n"), 16) - 65536
-                    if abs(self._rxbuff==255): 
-                        self._rxbuff = 0
-                else:
-                    self._rxbuff = int(UARTbuffer.decode().rstrip("\r\n"), 16)
+                self._rxbuff = int(UARTbuffer.decode().rstrip("\r\n"), 16)
 
     def _txEncode(self, para):
         _para = int(para)
@@ -279,6 +273,9 @@ class Device(object):
 
     def SetI2C(self, port_num, device):
         try:
-            setattr(self, "I2C{}".format(port_num), self.i2c_devices[device](port_num, self))
+            setattr(
+                self, "I2C{}".format(port_num), self.i2c_devices[device](port_num, self)
+            )
         except KeyError:
-            raise KeyError("Please Add "+ str(device) + "into i2c_devices list")
+            raise KeyError("Please Add " + str(device) + "into i2c_devices list")
+

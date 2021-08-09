@@ -8,8 +8,6 @@ class ServoExtension:
         _angle = self.dev._txEncode(angle)
         _buff = "I2C{}_SETANGLE_CH{}".format(self.i2c_port, channel)
         self.dev._sendbuff(self.dev.protocol[_buff], _angle)
-        self.dev._readbuff()
-        return self.dev._rxbuff
 
     def ChannelRelease(self, channel):
         # channel options: from 1 to 8
@@ -18,5 +16,3 @@ class ServoExtension:
 
         _buff = "I2C{}_CHRELEASE_CH{}".format(self.i2c_port, channel)
         self.dev._sendbuff(self.dev.protocol[_buff], 1)
-        self.dev._readbuff()
-        return self.dev._rxbuff
