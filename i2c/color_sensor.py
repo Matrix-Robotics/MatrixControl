@@ -18,7 +18,6 @@ class ColorSensor:
             11: "Spring Green",
             12: "Green",
             13: "Turquoise",
-            255: "-1",
         }
 
     def getColor(self, color):
@@ -44,4 +43,6 @@ class ColorSensor:
         _buff = "I2C{}_GET_COLORNUMBER".format(self.i2c_port)
         self.dev._sendbuff(self.dev.protocol[_buff])
         self.dev._readbuff()
-        return self.color_dict[self.dev._rxbuff]
+        if self.dev._rxbuff in self.color_dict.keys():
+            return self.color_dict[self.dev._rxbuff]
+        return ""

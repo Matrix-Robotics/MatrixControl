@@ -14,29 +14,63 @@ from i2c.motor_extension import MotorExtension
 class Device(object):
     def __init__(self, device_num, board_type, buad=115200, tout=0.1):
         """Using buad rate and tout to control Matrix Mini board.
-        Args:
-            borad_type (str): options: "Mini" or "Micro"
-            device_num (int): Device number, eg: 0, 1, ...
-            buad (int, optional): [buad rate]. Defaults to 115200.
-            tout (float, optional): [Upper limit of time out, seconds].
-            Defaults to 0.1.
+        ...
+
+        Parameters
+        ----------
+        borad_type : str 
+             Options: "Mini" or "Micro"
+        device_num : int
+             Device number, eg: 0, 1, ...
+        buad : int
+            (optional): buad rate. Defaults to 115200.
+        tout : float 
+            (optional) Upper limit of time out, seconds. Defaults to 0.1.
         """
 
         self.board_type = board_type
         if self.board_type == "Mini":
             self.protocol = MiniP
-            self.PORT_ADJUST = 1
-            self.MAX_ENCODE = 255
             self.BOOT_WAIT = 4
-            self.MOTOR_WAIT = 0
-            self.PID = "0403:6015"
+            self._PORT_ADJUST = 1
+            self._MAX_ENCODE = 255
+            self._MOTOR_WAIT = 0
+            self._PID = "0403:6015"
+            self.A1 = self.Analog(self, 1)
+            self.A2 = self.Analog(self, 2)
+            self.A3 = self.Analog(self, 3)
+            self.M1 = self.Motor(self, 1)
+            self.M2 = self.Motor(self, 2)
+            self.RC1 = self.RC(self, 1)
+            self.RC2 = self.RC(self, 2)
+            self.RC3 = self.RC(self, 3)
+            self.RC4 = self.RC(self, 4)
+            self.D1 = self.Digital(self, 1)
+            self.D2 = self.Digital(self, 2)
+            self.D3 = self.Digital(self, 3)
+            self.D4 = self.Digital(self, 4)
+            self.RGB1 = self.RGB(self, 1)
+            self.RGB2 = self.RGB(self, 2)
+            self.BTN1 = self.BTN(self, 1)
+            self.BTN2 = self.BTN(self, 2)
+
         else:
             self.protocol = MicroP
-            self.PORT_ADJUST = 0
-            self.MAX_ENCODE = 180
             self.BOOT_WAIT = 0.5
-            self.MOTOR_WAIT = 0.01
-            self.PID = "0D28:0204"
+            self._PORT_ADJUST = 0
+            self._MAX_ENCODE = 180
+            self._MOTOR_WAIT = 0.01
+            self._PID = "0D28:0204"
+            self.A1 = self.Analog(self, 1)
+            self.A2 = self.Analog(self, 2)
+            self.M1 = self.Motor(self, 1)
+            self.M2 = self.Motor(self, 2)
+            self.RC1 = self.RC(self, 1)
+            self.RC2 = self.RC(self, 2)
+            self.D1 = self.Digital(self, 1)
+            self.D2 = self.Digital(self, 2)
+            self.U1 = self.Uart(self, 1)
+            self.U2 = self.Uart(self, 2)
 
         self.i2c_devices = {
             "ColorSensor": ColorSensor,
@@ -67,7 +101,7 @@ class Device(object):
             com_ports_list = list(comports())
             _port_list = []
             for port in com_ports_list:
-                if port[2].startswith("USB VID:PID=" + self.PID):  # FIDI FT230XS
+                if port[2].startswith("USB VID:PID=" + self._PID):  # FIDI FT230XS
                     _port_list.append(port[0])
             self.portlist = _port_list
             if len(self.portlist) == 0:
@@ -100,165 +134,224 @@ class Device(object):
         while (time.time() - tic) < self._timeout:
             while self._port.in_waiting:
                 UARTbuffer = self._port.readline()
-                self._rxbuff = int(UARTbuffer.decode().rstrip("\r\n"), 16)
+                if len(UARTbuffer) > 1:
+                    self._rxbuff = int(UARTbuffer.decode().rstrip("\r\n"), 16)
+                else:
+                    self._rxbuff = None
 
     def _txEncode(self, para):
         _para = int(para)
-        if _para > self.MAX_ENCODE - self.PORT_ADJUST:
-            return self.MAX_ENCODE
+        if _para > self._MAX_ENCODE - self._PORT_ADJUST:
+            return self._MAX_ENCODE
         elif _para < 0:
             raise IndexError(
                 "Index out of range, "
-                "param is an integer between 0 and {}".format(self.MAX_ENCODE)
+                "param is an integer between 0 and {}".format(self._MAX_ENCODE)
             )
         else:
-            return _para + self.PORT_ADJUST
+            return _para + self._PORT_ADJUST
 
-    def setMOTOR(self, motor_port, pwm):
-        """Set Motor with specific socket and speed.
-        Args:
-            motor_port (int):
-                motor_port is corresponding with M1, M2 sockets on board.
-            pwm (int): Speed of motor.
+    class Motor:
+        """Set DC Motor Speed
+        ...
+
+        Parameters
+        ----------
+        dev : class 
+            MatrixControl.Device class
+        motor_port : int
+            motor_port is corresponding with M1, M2 sockets on board.
         """
 
-        if pwm < 0 and pwm > -101:
-            _pwm = 255 - (~pwm - self.PORT_ADJUST)
-        elif pwm > -1 and pwm < 101:
-            _pwm = pwm + self.PORT_ADJUST
-        else:
-            _pwm = None
-            raise IndexError(
-                "Index out of range, " "pwm is an integer between -101 to 101."
-            )
+        def __init__(self, dev, motor_port=1):
+            self.dev = dev
+            self.motor_port = motor_port
 
-        if motor_port in (1, 2):
-            _buff = "M{}_SET".format(motor_port)
-            self._sendbuff(self.protocol[_buff], _pwm)
-            time.sleep(self.MOTOR_WAIT)
-        else:
-            raise IndexError("Index out of range, motor_port options: 1 or 2.")
+        def set(self, pwm):
+            """Set Motor with specific socket and speed.
+            Args:
+                pwm (int): Speed of motor.
+            """
+            if pwm < 0 and pwm > -101:
+                _pwm = 255 - (~pwm - self.dev._PORT_ADJUST)
+            elif pwm > -1 and pwm < 101:
+                _pwm = pwm + self.dev._PORT_ADJUST
+            else:
+                _pwm = None
+                raise IndexError(
+                    "Index out of range, " "pwm is an integer between -101 to 101."
+                )
+            _buff = "M{}_SET".format(self.motor_port)
+            self.dev._sendbuff(self.dev.protocol[_buff], _pwm)
+            time.sleep(self.dev._MOTOR_WAIT)
 
-    def setRC(self, rc_port, angle):
+    class RC:
+        """Set RC Servo Angle
+        ...
+
+        Parameters
+        ----------
+        dev : class 
+            MatrixControl.Device class
+        rc_port : int
+            rc_port is corresponding with RC1, RC2, ... sockets on board.
         """
-        Args:
-            rc_port (int):
-                rc_port is corresponding with RC1, RC2... sockets on board.
-            angle (int): Angle of RC motor.
+
+        def __init__(self, dev, rc_port=1):
+            self.dev = dev
+            self.rc_port = rc_port
+
+        def set(self, angle):
+            """
+            Args:
+                angle (int): Angle of RC motor.
+            """
+            _angle = self.dev._txEncode(angle)
+            _buff = "RC{}_SET".format(self.rc_port)
+            self.dev._sendbuff(self.dev.protocol[_buff], _angle)
+
+        def releaseRC(self):
+            if self.board_type == "Mini":
+                raise ValueError("releaseRC only works on MATRIX Micro")
+            self.dev._sendbuff(MicroP.RCRLS_SET)
+
+    class Digital:
+        """Set & Get Digital
+        Parameters
+        ----------
+        dev : class 
+            MatrixControl.Device class
+        digital_port : int
+            digital_port is corresponding with D1, D2, ... sockets on board.
         """
-        _angle = self._txEncode(angle)
-        _buff = "RC{}_SET".format(rc_port)
 
-        if self.board_type == "Mini" and rc_port in range(1, 5):
-            self._sendbuff(self.protocol[_buff], _angle)
+        def __init__(self, dev, digital_port=1):
+            self.dev = dev
+            self.digital_port = digital_port
 
-        elif self.board_type == "Micro" and rc_port in range(1, 3):
-            self._sendbuff(self.protocol[_buff], _angle)
-        else:
-            raise IndexError(
-                "rc_port out of range, "
-                "MATRIX Mini digital_port is an integer from 1 to 4."
-                "MATRIX Micro digital_port is an integer from 1 to 2."
-            )
+        def setDIG(self, logic):
+            """
+            Args:
+                logic (int): logic is GPIO output, eithrt 0 or 1.
+            """
+            if self.board_type == "Micro":
+                raise ValueError("setDIG only works on MATRIX Mini")
 
-    def releaseRC(self):
-        if self.board_type == "Mini":
-            raise ValueError("releaseRC only works on MATRIX Micro")
-        self._sendbuff(MicroP.RCRLS_SET)
+            _logic = self._txEncode(logic)
+            _buff = "D{}_SET".format(self.digital_port)
+            self.dev._sendbuff(self.dev.protocol[_buff], _logic)
 
-    def setDIG(self, digital_port, logic):
+        def getDIG(self):
+            _buff = "D{}_GET".format(self.digital_port)
+            self.dev._sendbuff(self.dev.protocol[_buff])
+            self.dev._readbuff()
+            return self.dev._rxbuff
+
+    class RGB:
+        """Set RGB LED
+        Parameters
+        ----------
+        dev : class 
+            MatrixControl.Device class
+        light_port : int
+            light_port is RGB LEDs on board.
         """
-        Args:
-            digital_port (int)
-            logic (int): logic is GPIO output, eithrt 0 or 1.
+
+        def __init__(self, dev, light_port=1):
+            self.dev = dev
+            self.light_port = light_port
+
+        def setRGB(self, pwmR, pwmG, pwmB):
+            """
+            Args:
+                pwmR (int): 0~255.
+                pwmG (int): 0~255.
+                pwmB (int): 0~255.
+            """
+            if self.dev.board_type == "Micro":
+                raise ValueError("setRGB only works on MATRIX Mini")
+
+            _pwmR = self.dev._txEncode(pwmR)
+            _pwmG = self.dev._txEncode(pwmG)
+            _pwmB = self.dev._txEncode(pwmB)
+            _r_buff = "RGB{}R_SET".format(self.light_port)
+            _g_buff = "RGB{}G_SET".format(self.light_port)
+            _b_buff = "RGB{}B_SET".format(self.light_port)
+            self.dev._sendbuff(self.dev.protocol[_r_buff], _pwmR)
+            self.dev._sendbuff(self.dev.protocol[_g_buff], _pwmG)
+            self.dev._sendbuff(self.dev.protocol[_b_buff], _pwmB)
+
+    class BTN:
+        """Get Button
+        Parameters
+        ----------
+        dev : class 
+            MatrixControl.Device class
+        light_port : int
+            button_port is on board.
         """
-        if self.board_type == "Micro":
-            raise ValueError("setDIG only works on MATRIX Mini")
 
-        _logic = self._txEncode(logic)
-        if digital_port in range(1, 5):
-            _buff = "D{}_SET".format(digital_port)
-            self._sendbuff(self.protocol[_buff], _logic)
-        else:
-            raise IndexError(
-                "digital_port out of range, "
-                "MATRIX Mini digital_port is an integer from 1 to 4."
-            )
+        def __init__(self, dev, button_port=1):
+            self.dev = dev
+            self.button_port = button_port
 
-    def getDIG(self, digital_port):
-        _buff = "D{}_GET".format(digital_port)
-        if self.board_type == "Mini" and digital_port in range(1, 5):
-            self._sendbuff(self.protocol[_buff])
-        elif self.board_type == "Micro" and digital_port in range(1, 3):
-            self._sendbuff(self.protocol[_buff])
-        else:
-            raise IndexError(
-                "digital_port out of range, "
-                "MATRIX Mini  digital_port is an integer from 1 to 4."
-                "MATRIX Micro  digital_port is an integer from 1 to 2."
-            )
-        self._readbuff()
-        return self._rxbuff
+        def get(self):
+            if self.dev.board_type == "Micro":
+                raise ValueError("getBTN only works on MATRIX Mini")
 
-    def setRGB(self, light_port, pwmR, pwmG, pwmB):
-        if self.board_type == "Micro":
-            raise ValueError("setRGB only works on MATRIX Mini")
+            _buff = "BTN{}_GET".format(self.button_port)
+            self.dev._sendbuff(self.dev.protocol[_buff])
 
-        _pwmR = self._txEncode(pwmR)
-        _pwmG = self._txEncode(pwmG)
-        _pwmB = self._txEncode(pwmB)
-        if light_port in range(1, 3):
-            _r_buff = "RGB{}R_SET".format(light_port)
-            _g_buff = "RGB{}G_SET".format(light_port)
-            _b_buff = "RGB{}B_SET".format(light_port)
-            self._sendbuff(self.protocol[_r_buff], _pwmR)
-            self._sendbuff(self.protocol[_g_buff], _pwmG)
-            self._sendbuff(self.protocol[_b_buff], _pwmB)
-        else:
-            raise IndexError(
-                "light_port out of range, MATRIX Mini light_port \
-                    options: 1 or 2."
-            )
+            self.dev._readbuff()
+            return self.dev._rxbuff
 
-    def getBTN(self, button_port):
-        if self.board_type == "Micro":
-            raise ValueError("getBTN only works on MATRIX Mini")
+    class Analog:
+        """Analog Port.
+        Parameters
+        ----------
+        dev : class 
+            MatrixControl.Device class
+        analog_port int: 
+            analog_port is corresponding with A1, A2, ... sockets on board.
+        """
 
-        if button_port in range(1, 3):
-            _buff = "BTN{}_GET".format(button_port)
-            self._sendbuff(self.protocol[_buff])
-        else:
-            raise IndexError("button_port out of range, button_port options: 1 or 2.")
+        def __init__(self, dev, analog_port):
+            self.dev = dev
+            self.analog_port = analog_port
 
-        self._readbuff()
-        return self._rxbuff
+        def getANG(self):
+            _buff = "A{}_GET".format(self.analog_port)
+            self.dev._sendbuff(self.dev.protocol[_buff])
+            self.dev._readbuff()
+            return self.dev._rxbuff
 
-    def getANG(self, analog_port):
-        _buff = "A{}_GET".format(analog_port)
-        if self.board_type == "Mini" and analog_port in range(1, 4):
-            self._sendbuff(self.protocol[_buff])
-        elif self.board_type == "Micro" and analog_port in range(1, 3):
-            self._sendbuff(self.protocol[_buff])
-        else:
-            raise IndexError(
-                "analog_port out of range, "
-                "MATRIX Mini analog_port is an integer from 1 to 3; "
-                "MATRIX Micro analog_port is from 1 to 2."
-            )
-        self._readbuff()
-        return self._rxbuff
+        def getDIG(self):
+            _buff = "A{}_D_GET".format(self.analog_port)
+            self.dev._sendbuff(self.dev.protocol[_buff])
+            self.dev._readbuff()
+            return self.dev._rxbuff
 
-    def getUR(self, ur_port):
-        if self.board_type == "Mini":
-            raise ValueError("getUR only works on MATRIX Micro")
+    class Uart:
+        """Get Uart Port.
+        Parameters
+        ----------
+        dev : class 
+            MatrixControl.Device class
+        uart_port int: 
+            Uart Port Number, eg: 0, 1, ...
+        """
 
-        _buff = "URD{}_GET".format(ur_port)
-        if ur_port in range(1, 3):
-            self._sendbuff(self.protocol[_buff])
-        else:
-            raise IndexError("ur_port out of range, ur_port is from 1 to 2.")
-        self._readbuff()
-        return self._rxbuff
+        def __init__(self, dev, ur_port):
+            self.dev = dev
+            self.ur_port = ur_port
+
+        def get(self):
+            if self.dev.board_type == "Mini":
+                raise ValueError("getUR only works on MATRIX Micro")
+            _buff = "URD{}_GET".format(self.ur_port)
+            self.dev._sendbuff(self.dev.protocol[_buff])
+            self.dev_readbuff()
+            return self.dev._rxbuff
 
     def RST(self):
         self._port.close()

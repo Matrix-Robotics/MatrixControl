@@ -117,7 +117,6 @@ MiniP = {
     "I2C3_SETFILTER": "MINI73",
     "I2C4_SETFILTER": "MINI74",    
 
-
     "BTN1_GET": "MINI80",
     "BTN2_GET": "MINI81",
     "D1_GET": "MINI82",
@@ -213,7 +212,9 @@ MiniP = {
     "I2C3_GETTEMP": "MINID7",
     "I2C4_GETTEMP": "MINID8",  
 
-
+    "A1_D_GET": "MINID9",
+    "A2_D_GET": "MINIDA",
+    "A3_D_GET": "MINIDB",
 }
 
 MicroP = {
