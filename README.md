@@ -39,21 +39,54 @@ You can use MatrixControl library to control any MATRIX controller via any devic
 ## Basic Usage
 
 ```python
+import time
 from MatrixControl import Device
 
-device1 = Device(0, "Micro", 115200) # set the first device to Micro (Can choose either Micro or Mini)
-                                     # default buad is 115200
-                                           
-device2 = Device(1, "Mini", 115200)  # set the second device to Mini (Can choose either Micro or Mini)
-                                           # default buad is 115200
+Mini1 = Device(0, "Mini")
 
-device1.setRC(1, 100) # set RCservo 1 to Angle 100
-device2.setMOTOR(2, 90) # set Motor 2 to Speed 90
+t = 1
+limit = 100
+step = 5
+
+try:
+    while True:
+        # get Button click, 1 means true, 0 means false
+        print("BTN1:", Mini1.BTN1.get())
+        print("BTN2:", Mini1.BTN2.get())
+        # get Analog data
+        print("A1 ANG:", Mini1.A1.getANG())
+        print("A2 ANG:", Mini1.A2.getANG())
+        print("A3 ANG:", Mini1.A3.getANG())
+        # get Digital data
+        print("D1 DIG:", Mini1.D1.getDIG())
+        print("D2 DIG:", Mini1.D2.getDIG())
+        print("D3 DIG:", Mini1.D3.getDIG())
+
+        # set Motor speed
+        Mini1.M1.set(50)
+        Mini1.M2.set(50)
+        # set RGB LED
+        Mini1.RGB1.setRGB(0, 0, 255)
+        Mini1.RGB2.setRGB(0, 0, 0)
+        time.sleep(t)
+
+        Mini1.M1.set(-50)
+        Mini1.M2.set(-50)
+        Mini1.RGB1.setRGB(0, 0, 0)
+        Mini1.RGB2.setRGB(0, 0, 255)
+        time.sleep(t)
+        print("=========================")
+
+except KeyboardInterrupt:
+    Mini1.close()
+    print("DeviceClose")
 ```
+# I2C Devices
+Checkout [**examples**](./examples) for more information.
 
 # CAUTION
 
-Make sure Raspberry pi's buad rate is equal to your MatrixController's. (Default buad rate is 115200) 
+Make sure master device buad rate is equal to your MatrixController's. (Default buad rate is 115200) 
 
 ## License
 

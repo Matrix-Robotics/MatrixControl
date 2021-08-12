@@ -300,10 +300,8 @@ class Device(object):
             self.button_port = button_port
 
         def get(self):
-
             _buff = "BTN{}_GET".format(self.button_port)
             self.dev._sendbuff(self.dev.protocol[_buff])
-
             self.dev._readbuff()
             return self.dev._rxbuff
 
