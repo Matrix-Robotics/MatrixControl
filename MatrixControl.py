@@ -350,4 +350,3 @@ class Device(object):
             )
         except KeyError:
             raise KeyError("Please Add " + str(device) + "into i2c_devices list")
-
