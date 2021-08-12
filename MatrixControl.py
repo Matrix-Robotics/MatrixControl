@@ -283,6 +283,7 @@ class Device(object):
             self.dev._sendbuff(self.dev.protocol[_r_buff], _pwmR)
             self.dev._sendbuff(self.dev.protocol[_g_buff], _pwmG)
             self.dev._sendbuff(self.dev.protocol[_b_buff], _pwmB)
+            time.sleep(0.1)
 
     class BTN:
         """Get Button
