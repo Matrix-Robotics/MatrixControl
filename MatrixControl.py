@@ -69,8 +69,8 @@ class Device(object):
             self.RC2 = self.RC(self, 2)
             self.D1 = self.Digital(self, 1)
             self.D2 = self.Digital(self, 2)
-            self.U1 = self.Uart(self, 1)
-            self.U2 = self.Uart(self, 2)
+            self.RGB1 = self.RGB(self, 1)
+            self.RGB2 = self.RGB(self, 2)
 
         self.i2c_devices = {
             "ColorSensor": ColorSensor,
@@ -211,8 +211,6 @@ class Device(object):
             self.dev._sendbuff(self.dev.protocol[_buff], _angle)
 
         def releaseRC(self):
-            if self.board_type == "Mini":
-                raise ValueError("releaseRC only works on MATRIX Micro")
             self.dev._sendbuff(MicroP.RCRLS_SET)
 
     class Digital:
@@ -247,6 +245,13 @@ class Device(object):
             self.dev._readbuff()
             return self.dev._rxbuff
 
+        def getURD(self):
+            # Get Ultra sonic sensor
+            _buff = "URD{}_GET".format(self.ur_port)
+            self.dev._sendbuff(self.dev.protocol[_buff])
+            self.dev_readbuff()
+            return self.dev._rxbuff
+
     class RGB:
         """Set RGB LED
         Parameters
@@ -268,8 +273,6 @@ class Device(object):
                 pwmG (int): 0~255.
                 pwmB (int): 0~255.
             """
-            if self.dev.board_type == "Micro":
-                raise ValueError("setRGB only works on MATRIX Mini")
 
             _pwmR = self.dev._txEncode(pwmR)
             _pwmG = self.dev._txEncode(pwmG)
@@ -296,8 +299,6 @@ class Device(object):
             self.button_port = button_port
 
         def get(self):
-            if self.dev.board_type == "Micro":
-                raise ValueError("getBTN only works on MATRIX Mini")
 
             _buff = "BTN{}_GET".format(self.button_port)
             self.dev._sendbuff(self.dev.protocol[_buff])
@@ -329,28 +330,6 @@ class Device(object):
             _buff = "A{}_D_GET".format(self.analog_port)
             self.dev._sendbuff(self.dev.protocol[_buff])
             self.dev._readbuff()
-            return self.dev._rxbuff
-
-    class Uart:
-        """Get Uart Port.
-        Parameters
-        ----------
-        dev : class 
-            MatrixControl.Device class
-        uart_port int: 
-            Uart Port Number, eg: 0, 1, ...
-        """
-
-        def __init__(self, dev, ur_port):
-            self.dev = dev
-            self.ur_port = ur_port
-
-        def get(self):
-            if self.dev.board_type == "Mini":
-                raise ValueError("getUR only works on MATRIX Micro")
-            _buff = "URD{}_GET".format(self.ur_port)
-            self.dev._sendbuff(self.dev.protocol[_buff])
-            self.dev_readbuff()
             return self.dev._rxbuff
 
     def RST(self):
