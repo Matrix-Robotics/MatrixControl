@@ -12,7 +12,7 @@ while True:
 
     channel = 1
     angle = 0
-    Mini1.I2C1.setAngle(channel, angle)
+    Mini1.SE1.setAngle(channel, angle)
     print("set channel " + str(channel) + " to " + str(angle))
     time.sleep(0.25)
 
