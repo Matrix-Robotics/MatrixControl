@@ -14,7 +14,6 @@ from i2c.motor_extension import MotorExtension
 class Device(object):
     def __init__(self, device_num, board_type, buad=115200, tout=0.1):
         """Using buad rate and tout to control Matrix Mini board.
-        ...
 
         Parameters
         ----------
@@ -152,79 +151,78 @@ class Device(object):
             return _para + self._PORT_ADJUST
 
     class Motor:
-        """Set DC Motor Speed
-        ...
+        """Set DC Motor Speed.
 
         Parameters
         ----------
-        dev : class 
+        _dev : class 
             MatrixControl.Device class
         motor_port : int
             motor_port is corresponding with M1, M2 sockets on board.
         """
 
-        def __init__(self, dev, motor_port=1):
-            self.dev = dev
+        def __init__(self, _dev, motor_port=1):
+            self._dev = _dev
             self.motor_port = motor_port
 
         def set(self, pwm):
             """Set Motor with specific socket and speed.
             Args:
-                pwm (int): Speed of motor.
+                pwm (int): Speed of motor. value: 100 ~ -100.
             """
             if pwm < 0 and pwm > -101:
-                _pwm = 255 - (~pwm - self.dev._PORT_ADJUST)
+                _pwm = 255 - (~pwm - self._dev._PORT_ADJUST)
             elif pwm > -1 and pwm < 101:
-                _pwm = pwm + self.dev._PORT_ADJUST
+                _pwm = pwm + self._dev._PORT_ADJUST
             else:
                 _pwm = None
                 raise IndexError(
-                    "Index out of range, " "pwm is an integer between -101 to 101."
+                    "Index out of range, " "pwm is an integer between -101 to 100."
                 )
             _buff = "M{}_SET".format(self.motor_port)
-            self.dev._sendbuff(self.dev.protocol[_buff], _pwm)
-            time.sleep(self.dev._MOTOR_WAIT)
+            self._dev._sendbuff(self._dev.protocol[_buff], _pwm)
+            time.sleep(self._dev._MOTOR_WAIT)
 
     class RC:
-        """Set RC Servo Angle
-        ...
+        """Set RC Servo Angle.
 
         Parameters
         ----------
-        dev : class 
+        _dev : class 
             MatrixControl.Device class
         rc_port : int
             rc_port is corresponding with RC1, RC2, ... sockets on board.
         """
 
-        def __init__(self, dev, rc_port=1):
-            self.dev = dev
+        def __init__(self, _dev, rc_port=1):
+            self._dev = _dev
             self.rc_port = rc_port
 
         def set(self, angle):
             """
             Args:
-                angle (int): Angle of RC motor.
+                angle (int): Angle of RC motor. value: 0 ~ 180.
             """
-            _angle = self.dev._txEncode(angle)
+            _angle = self._dev._txEncode(angle)
             _buff = "RC{}_SET".format(self.rc_port)
-            self.dev._sendbuff(self.dev.protocol[_buff], _angle)
+            self._dev._sendbuff(self._dev.protocol[_buff], _angle)
 
         def releaseRC(self):
-            self.dev._sendbuff(MicroP.RCRLS_SET)
+            self._dev._sendbuff(MicroP.RCRLS_SET)
 
     class Digital:
-        """Set & Get Digital
+        """Set & Get Digital.
+
         Parameters
         ----------
-        dev : class 
+        _dev : class 
             MatrixControl.Device class
         digital_port : int
             digital_port is corresponding with D1, D2, ... sockets on board.
         """
 
-        def __init__(self, dev, digital_port=1):
-            self.dev = dev
+        def __init__(self, _dev, digital_port=1):
+            self._dev = _dev
             self.digital_port = digital_port
 
         def setDIG(self, logic):
@@ -237,33 +235,34 @@ class Device(object):
 
             _logic = self._txEncode(logic)
             _buff = "D{}_SET".format(self.digital_port)
-            self.dev._sendbuff(self.dev.protocol[_buff], _logic)
+            self._dev._sendbuff(self._dev.protocol[_buff], _logic)
 
         def getDIG(self):
             _buff = "D{}_GET".format(self.digital_port)
-            self.dev._sendbuff(self.dev.protocol[_buff])
-            self.dev._readbuff()
-            return self.dev._rxbuff
+            self._dev._sendbuff(self._dev.protocol[_buff])
+            self._dev._readbuff()
+            return self._dev._rxbuff
 
         def getURD(self):
             # Get Ultra sonic sensor
             _buff = "URD{}_GET".format(self.ur_port)
-            self.dev._sendbuff(self.dev.protocol[_buff])
+            self._dev._sendbuff(self._dev.protocol[_buff])
             self.dev_readbuff()
-            return self.dev._rxbuff
+            return self._dev._rxbuff
 
     class RGB:
-        """Set RGB LED
+        """Set RGB LED.
+
         Parameters
         ----------
-        dev : class 
+        _dev : class 
             MatrixControl.Device class
         light_port : int
             light_port is RGB LEDs on board.
         """
 
-        def __init__(self, dev, light_port=1):
-            self.dev = dev
+        def __init__(self, _dev, light_port=1):
+            self._dev = _dev
             self.light_port = light_port
 
         def setRGB(self, pwmR, pwmG, pwmB):
@@ -274,62 +273,64 @@ class Device(object):
                 pwmB (int): 0~255.
             """
 
-            _pwmR = self.dev._txEncode(pwmR)
-            _pwmG = self.dev._txEncode(pwmG)
-            _pwmB = self.dev._txEncode(pwmB)
+            _pwmR = self._dev._txEncode(pwmR)
+            _pwmG = self._dev._txEncode(pwmG)
+            _pwmB = self._dev._txEncode(pwmB)
             _r_buff = "RGB{}R_SET".format(self.light_port)
             _g_buff = "RGB{}G_SET".format(self.light_port)
             _b_buff = "RGB{}B_SET".format(self.light_port)
-            self.dev._sendbuff(self.dev.protocol[_r_buff], _pwmR)
-            self.dev._sendbuff(self.dev.protocol[_g_buff], _pwmG)
-            self.dev._sendbuff(self.dev.protocol[_b_buff], _pwmB)
+            self._dev._sendbuff(self._dev.protocol[_r_buff], _pwmR)
+            self._dev._sendbuff(self._dev.protocol[_g_buff], _pwmG)
+            self._dev._sendbuff(self._dev.protocol[_b_buff], _pwmB)
             time.sleep(0.1)
 
     class BTN:
-        """Get Button
+        """Get Button click or not.
+
         Parameters
         ----------
-        dev : class 
+        _dev : class 
             MatrixControl.Device class
         light_port : int
             button_port is on board.
         """
 
-        def __init__(self, dev, button_port=1):
-            self.dev = dev
+        def __init__(self, _dev, button_port=1):
+            self._dev = _dev
             self.button_port = button_port
 
         def get(self):
             _buff = "BTN{}_GET".format(self.button_port)
-            self.dev._sendbuff(self.dev.protocol[_buff])
-            self.dev._readbuff()
-            return self.dev._rxbuff
+            self._dev._sendbuff(self._dev.protocol[_buff])
+            self._dev._readbuff()
+            return self._dev._rxbuff
 
     class Analog:
-        """Analog Port.
+        """Get Analog Port.
+
         Parameters
         ----------
-        dev : class 
+        _dev : class 
             MatrixControl.Device class
         analog_port int: 
             analog_port is corresponding with A1, A2, ... sockets on board.
         """
 
-        def __init__(self, dev, analog_port):
-            self.dev = dev
+        def __init__(self, _dev, analog_port):
+            self._dev = _dev
             self.analog_port = analog_port
 
         def getANG(self):
             _buff = "A{}_GET".format(self.analog_port)
-            self.dev._sendbuff(self.dev.protocol[_buff])
-            self.dev._readbuff()
-            return self.dev._rxbuff
+            self._dev._sendbuff(self._dev.protocol[_buff])
+            self._dev._readbuff()
+            return self._dev._rxbuff
 
         def getDIG(self):
             _buff = "A{}_D_GET".format(self.analog_port)
-            self.dev._sendbuff(self.dev.protocol[_buff])
-            self.dev._readbuff()
-            return self.dev._rxbuff
+            self._dev._sendbuff(self._dev.protocol[_buff])
+            self._dev._readbuff()
+            return self._dev._rxbuff
 
     def RST(self):
         self._port.close()
@@ -342,10 +343,20 @@ class Device(object):
         self.RST()
         self._port.close()
 
-    def SetI2C(self, port_num, device):
+    def SetI2C(self, i2c_port, device):
+        """Set I2C Port with corresponding device.
+
+        Parameters
+        ----------
+        i2c_port : int
+            i2c_port is starts from 1 to 4.
+        device : str 
+            Choose device from i2c_devices dict.
+            Support devices: ColorSensor, MotionSensor, ServoExtension, MotorExtension,
+        """
         try:
             setattr(
-                self, "I2C{}".format(port_num), self.i2c_devices[device](port_num, self)
+                self, "I2C{}".format(i2c_port), self.i2c_devices[device](self, i2c_port)
             )
         except KeyError:
             raise KeyError("Please Add " + str(device) + "into i2c_devices list")
