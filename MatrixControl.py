@@ -9,6 +9,7 @@ from i2c.color_sensor import ColorSensor
 from i2c.motion_sensor import MotionSensor
 from i2c.servo_extension import ServoExtension
 from i2c.motor_extension import MotorExtension
+from i2c.laser_sensor import LaserSensor
 
 
 class Device(object):
@@ -76,6 +77,7 @@ class Device(object):
             "MotionSensor": MotionSensor,
             "ServoExtension": ServoExtension,
             "MotorExtension": MotorExtension,
+            "LaserSensor": LaserSensor,
         }
 
         # rxbuff: recieve buffer
@@ -352,7 +354,7 @@ class Device(object):
             i2c_port is starts from 1 to 4.
         device : str 
             Choose device from i2c_devices dict.
-            Support devices: ColorSensor, MotionSensor, ServoExtension, MotorExtension,
+            Support devices: ColorSensor, MotionSensor, ServoExtension, MotorExtension, LaserSensor
         """
         try:
             setattr(

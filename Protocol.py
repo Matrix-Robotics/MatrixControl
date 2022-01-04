@@ -147,6 +147,10 @@ MiniP = {
     "I2C4_GETGYRO_X": "MINID1",
     "I2C4_GETGYRO_Y": "MINID2",
     "I2C4_GETGYRO_Z": "MINID3",
+    "I2C1_GETDIS": "MINID4",
+    "I2C2_GETDIS": "MINID5",
+    "I2C3_GETDIS": "MINID6",
+    "I2C4_GETDIS": "MINID7",
 }
 
 MicroP = {
