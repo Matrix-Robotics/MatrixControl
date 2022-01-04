@@ -23,6 +23,11 @@ try:
         print("D1 DIG:", Mini1.D1.getDIG())
         print("D2 DIG:", Mini1.D2.getDIG())
         print("D3 DIG:", Mini1.D3.getDIG())
+        # # set Digital IO
+        # Mini1.D1.setDIG(0)
+        # Mini1.D2.setDIG(0)
+        # Mini1.D3.setDIG(0)
+        # Mini1.D4.setDIG(0)
 
         # set Motor speed
         Mini1.M1.set(50)
@@ -30,12 +35,22 @@ try:
         # set RGB LED
         Mini1.RGB1.setRGB(0, 0, 255)
         Mini1.RGB2.setRGB(0, 0, 0)
+        # set RC servo angle
+        Mini1.RC1.set(0)
+        Mini1.RC2.set(0)
+        Mini1.RC3.set(0)
+        Mini1.RC4.set(0)
+        
         time.sleep(t)
 
         Mini1.M1.set(-50)
         Mini1.M2.set(-50)
         Mini1.RGB1.setRGB(0, 0, 0)
         Mini1.RGB2.setRGB(0, 0, 255)
+        Mini1.RC1.set(180)
+        Mini1.RC2.set(180)
+        Mini1.RC3.set(180)
+        Mini1.RC4.set(180)
         time.sleep(t)
         print("=========================")
 
